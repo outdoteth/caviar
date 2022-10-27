@@ -61,24 +61,24 @@ contract Pair is ERC20 {
     }
 
     function buy(uint256 outputAmount, uint256 maxInputAmount) public returns (uint256) {
-        uint256 amountIn = (outputAmount * baseTokenReserves()) / (fractionalTokenReserves() - outputAmount);
+        uint256 inputAmount = (outputAmount * baseTokenReserves()) / (fractionalTokenReserves() - outputAmount);
 
         // ~~~~~~ Checks ~~~~~~ //
 
         // check that the required amount of base tokens is less than the max amount
-        require(amountIn <= maxInputAmount, "Slippage: amount in is too large");
+        require(inputAmount <= maxInputAmount, "Slippage: amount in is too large");
 
         // ~~~~~~ Effects ~~~~~~ //
 
         // transfer fractional tokens to sender
-        transfer(msg.sender, outputAmount);
+        _transferFrom(address(this), msg.sender, outputAmount);
 
         // ~~~~~~ Interactions ~~~~~~ //
 
         // transfer base tokens in
-        ERC20(baseToken).transferFrom(msg.sender, address(this), amountIn);
+        ERC20(baseToken).transferFrom(msg.sender, address(this), inputAmount);
 
-        return amountIn;
+        return inputAmount;
     }
 
     // =================== //
@@ -91,6 +91,10 @@ contract Pair is ERC20 {
 
     function fractionalTokenReserves() public view returns (uint256) {
         return balanceOf[address(this)];
+    }
+
+    function buyQuote(uint256 outputAmount) public view returns (uint256) {
+        return (outputAmount * baseTokenReserves()) / (fractionalTokenReserves() - outputAmount);
     }
 
     function price() public view returns (uint256) {

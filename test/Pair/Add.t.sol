@@ -8,8 +8,8 @@ import "../shared/Fixture.t.sol";
 import "../../src/Caviar.sol";
 
 contract AddTest is Fixture {
-    uint256 baseTokenAmount = 100;
-    uint256 fractionalTokenAmount = 30;
+    uint256 public baseTokenAmount = 100;
+    uint256 public fractionalTokenAmount = 30;
 
     function setUp() public {
         deal(address(usd), address(this), baseTokenAmount, true);
