@@ -81,6 +81,27 @@ contract Pair is ERC20 {
         return inputAmount;
     }
 
+    function sell(uint256 inputAmount, uint256 minOutputAmount) public returns (uint256) {
+        uint256 outputAmount = (inputAmount * fractionalTokenReserves()) / (baseTokenReserves() + inputAmount);
+
+        // ~~~~~~ Checks ~~~~~~ //
+
+        // check that the outputted amount of fractional tokens is greater than the min amount
+        require(outputAmount >= minOutputAmount, "Slippage: amount out is too small");
+
+        // ~~~~~~ Effects ~~~~~~ //
+
+        // transfer fractional tokens from sender
+        _transferFrom(msg.sender, address(this), inputAmount);
+
+        // ~~~~~~ Interactions ~~~~~~ //
+
+        // transfer base tokens out
+        ERC20(baseToken).transfer(msg.sender, outputAmount);
+
+        return inputAmount;
+    }
+
     // =================== //
     // ===== Getters ===== //
     // =================== //
