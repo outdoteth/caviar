@@ -19,6 +19,10 @@ contract Pair is ERC20 {
         lpToken = address(new LpToken("LP token", "LPT", 18));
     }
 
+    // ====================== //
+    // ===== Core logic ===== //
+    // ====================== //
+
     function add(uint256 baseTokenAmount, uint256 fractionalTokenAmount, uint256 minLpTokenAmount)
         public
         returns (uint256)
@@ -56,6 +60,31 @@ contract Pair is ERC20 {
         return lpTokenAmount;
     }
 
+    function buy(uint256 outputAmount, uint256 maxInputAmount) public returns (uint256) {
+        uint256 amountIn = (outputAmount * baseTokenReserves()) / (fractionalTokenReserves() - outputAmount);
+
+        // ~~~~~~ Checks ~~~~~~ //
+
+        // check that the required amount of base tokens is less than the max amount
+        require(amountIn <= maxInputAmount, "Slippage: amount in is too large");
+
+        // ~~~~~~ Effects ~~~~~~ //
+
+        // transfer fractional tokens to sender
+        transfer(msg.sender, outputAmount);
+
+        // ~~~~~~ Interactions ~~~~~~ //
+
+        // transfer base tokens in
+        ERC20(baseToken).transferFrom(msg.sender, address(this), amountIn);
+
+        return amountIn;
+    }
+
+    // =================== //
+    // ===== Getters ===== //
+    // =================== //
+
     function baseTokenReserves() public view returns (uint256) {
         return ERC20(baseToken).balanceOf(address(this));
     }
@@ -70,6 +99,10 @@ contract Pair is ERC20 {
 
         return (baseTokenBalance * ONE) / fractionalTokenBalance;
     }
+
+    // ========================== //
+    // ===== Internal utils ===== //
+    // ========================== //
 
     function _transferFrom(address from, address to, uint256 amount) internal returns (bool) {
         balanceOf[from] -= amount;
