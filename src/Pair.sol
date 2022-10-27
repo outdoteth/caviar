@@ -99,7 +99,7 @@ contract Pair is ERC20 {
         // transfer base tokens out
         ERC20(baseToken).transfer(msg.sender, outputAmount);
 
-        return inputAmount;
+        return outputAmount;
     }
 
     // =================== //

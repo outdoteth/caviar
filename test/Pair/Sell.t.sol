@@ -7,9 +7,9 @@ import "forge-std/console.sol";
 import "../shared/Fixture.t.sol";
 import "../../src/Caviar.sol";
 
-contract BuyTest is Fixture {
-    uint256 public outputAmount = 10;
-    uint256 public maxInputAmount;
+contract SellTest is Fixture {
+    uint256 public inputAmount = 10;
+    uint256 public minOutputAmount;
 
     function setUp() public {
         uint256 baseTokenAmount = 100;
@@ -23,19 +23,19 @@ contract BuyTest is Fixture {
         uint256 minLpTokenAmount = baseTokenAmount * fractionalTokenAmount;
         p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount);
 
-        maxInputAmount = (outputAmount * p.baseTokenReserves()) / (p.fractionalTokenReserves() - outputAmount);
-        deal(address(usd), address(this), maxInputAmount, true);
+        minOutputAmount = (inputAmount * p.fractionalTokenReserves()) / (p.baseTokenReserves() + inputAmount);
+        deal(address(p), address(this), inputAmount, true);
     }
 
-    function testItReturnsInputAmount() public {
+    function testItReturnsOutputAmount() public {
         // arrange
-        uint256 expectedInputAmount = maxInputAmount;
+        uint256 expectedOutputAmount = minOutputAmount;
 
         // act
-        uint256 inputAmount = p.buy(outputAmount, maxInputAmount);
+        uint256 outputAmount = p.sell(inputAmount, expectedOutputAmount);
 
         // assert
-        assertEq(inputAmount, expectedInputAmount, "Should have returned input amount");
+        assertEq(outputAmount, expectedOutputAmount, "Should have returned output amount");
     }
 
     function testItTransfersBaseTokens() public {
@@ -44,16 +44,16 @@ contract BuyTest is Fixture {
         uint256 thisBalanceBefore = usd.balanceOf(address(this));
 
         // act
-        p.buy(outputAmount, maxInputAmount);
+        p.sell(inputAmount, minOutputAmount);
 
         // assert
         assertEq(
-            usd.balanceOf(address(p)) - balanceBefore, maxInputAmount, "Should have transferred base tokens to pair"
+            balanceBefore - usd.balanceOf(address(p)), minOutputAmount, "Should have transferred base tokens from pair"
         );
         assertEq(
-            thisBalanceBefore - usd.balanceOf(address(this)),
-            maxInputAmount,
-            "Should have transferred base tokens from sender"
+            usd.balanceOf(address(this)) - thisBalanceBefore,
+            minOutputAmount,
+            "Should have transferred base tokens to sender"
         );
     }
 
@@ -63,25 +63,25 @@ contract BuyTest is Fixture {
         uint256 thisBalanceBefore = p.balanceOf(address(this));
 
         // act
-        p.buy(outputAmount, maxInputAmount);
+        p.sell(inputAmount, minOutputAmount);
 
         // assert
         assertEq(
-            p.balanceOf(address(this)) - thisBalanceBefore,
-            outputAmount,
+            thisBalanceBefore - p.balanceOf(address(this)),
+            inputAmount,
             "Should have transferred fractional tokens from sender"
         );
         assertEq(
-            balanceBefore - p.balanceOf(address(p)), outputAmount, "Should have transferred fractional tokens to pair"
+            p.balanceOf(address(p)) - balanceBefore, inputAmount, "Should have transferred fractional tokens to pair"
         );
     }
 
-    function testItRevertsSlippageOnBuy() public {
+    function testItRevertsSlippageOnSell() public {
         // arrange
-        maxInputAmount -= 1; // subtract 1 to cause revert
+        minOutputAmount += 1; // add 1 to cause revert
 
         // act
-        vm.expectRevert("Slippage: amount in is too large");
-        p.buy(outputAmount, maxInputAmount);
+        vm.expectRevert("Slippage: amount out is too small");
+        p.sell(inputAmount, minOutputAmount);
     }
 }
