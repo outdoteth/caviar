@@ -9,6 +9,6 @@ optimizer_runs = 100_000
 runs = 1024
 
 [fmt]
-line_length = 100
+line_length = 120
 
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config
