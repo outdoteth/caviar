@@ -193,11 +193,17 @@ contract Pair is ERC20, ERC721TokenReceiver {
     }
 
     function nftBuy(uint256[] calldata tokenIds, uint256 maxInputAmount) public returns (uint256) {
-        uint256 outputAmount = tokenIds.length * 1e18;
-        uint256 inputAmount = buy(outputAmount, maxInputAmount);
+        uint256 inputAmount = buy(tokenIds.length * 1e18, maxInputAmount);
         unwrap(tokenIds);
 
         return inputAmount;
+    }
+
+    function nftSell(uint256[] calldata tokenIds, uint256 minOutputAmount) public returns (uint256) {
+        uint256 inputAmount = wrap(tokenIds);
+        uint256 outputAmount = sell(inputAmount, minOutputAmount);
+
+        return outputAmount;
     }
 
     // =================== //
