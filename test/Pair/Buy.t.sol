@@ -81,7 +81,7 @@ contract BuyTest is Fixture {
         maxInputAmount -= 1; // subtract 1 to cause revert
 
         // act
-        vm.expectRevert("Slippage: amount in is too large");
+        vm.expectRevert("Slippage: amount in");
         p.buy(outputAmount, maxInputAmount);
     }
 }

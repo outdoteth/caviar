@@ -42,7 +42,7 @@ contract Pair is ERC20 {
         // ~~~~~~ Checks ~~~~~~ //
 
         // check that the amount of lp tokens outputted is greater than the min amount
-        require(lpTokenAmount >= minLpTokenAmount, "Slippage: Insufficient lp token output amount");
+        require(lpTokenAmount >= minLpTokenAmount, "Slippage: lp token amount out");
 
         // ~~~~~~ Effects ~~~~~~ //
 
@@ -66,7 +66,7 @@ contract Pair is ERC20 {
         // ~~~~~~ Checks ~~~~~~ //
 
         // check that the required amount of base tokens is less than the max amount
-        require(inputAmount <= maxInputAmount, "Slippage: amount in is too large");
+        require(inputAmount <= maxInputAmount, "Slippage: amount in");
 
         // ~~~~~~ Effects ~~~~~~ //
 
@@ -87,7 +87,7 @@ contract Pair is ERC20 {
         // ~~~~~~ Checks ~~~~~~ //
 
         // check that the outputted amount of fractional tokens is greater than the min amount
-        require(outputAmount >= minOutputAmount, "Slippage: amount out is too small");
+        require(outputAmount >= minOutputAmount, "Slippage: amount out");
 
         // ~~~~~~ Effects ~~~~~~ //
 
@@ -114,13 +114,10 @@ contract Pair is ERC20 {
         // ~~~~~~ Checks ~~~~~~ //
 
         // check that the base token output amount is greater than the min amount
-        require(baseTokenOutputAmount >= minBaseTokenOutputAmount, "Slippage: base token amount out is too small");
+        require(baseTokenOutputAmount >= minBaseTokenOutputAmount, "Slippage: base token amount out");
 
         // check that the fractional token output amount is greater than the min amount
-        require(
-            fractionalTokenOutputAmount >= minFractionalTokenOutputAmount,
-            "Slippage: fractional token amount out is too small"
-        );
+        require(fractionalTokenOutputAmount >= minFractionalTokenOutputAmount, "Slippage: fractional token amount out");
 
         // ~~~~~~ Effects ~~~~~~ //
 

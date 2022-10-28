@@ -81,7 +81,7 @@ contract SellTest is Fixture {
         minOutputAmount += 1; // add 1 to cause revert
 
         // act
-        vm.expectRevert("Slippage: amount out is too small");
+        vm.expectRevert("Slippage: amount out");
         p.sell(inputAmount, minOutputAmount);
     }
 }

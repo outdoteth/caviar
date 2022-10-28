@@ -68,7 +68,7 @@ contract AddTest is Fixture {
         uint256 minLpTokenAmount = (baseTokenAmount * fractionalTokenAmount) + 1; // increase 1 to cause revert
 
         // act
-        vm.expectRevert("Slippage: Insufficient lp token output amount");
+        vm.expectRevert("Slippage: lp token amount out");
         p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount);
     }
 
@@ -107,7 +107,7 @@ contract AddTest is Fixture {
         fractionalTokenAmount = fractionalTokenAmount * 17;
 
         // act
-        vm.expectRevert("Slippage: Insufficient lp token output amount");
+        vm.expectRevert("Slippage: lp token amount out");
         p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount);
     }
 }
