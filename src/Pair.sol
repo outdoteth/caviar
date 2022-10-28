@@ -192,6 +192,14 @@ contract Pair is ERC20, ERC721TokenReceiver {
         return lpTokenAmount;
     }
 
+    function nftBuy(uint256[] calldata tokenIds, uint256 maxInputAmount) public returns (uint256) {
+        uint256 outputAmount = tokenIds.length * 1e18;
+        uint256 inputAmount = buy(outputAmount, maxInputAmount);
+        unwrap(tokenIds);
+
+        return inputAmount;
+    }
+
     // =================== //
     // ===== Getters ===== //
     // =================== //
