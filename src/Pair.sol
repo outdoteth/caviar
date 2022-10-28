@@ -7,7 +7,7 @@ import "openzeppelin/utils/math/Math.sol";
 
 import "./LpToken.sol";
 
-contract Pair is ERC20 {
+contract Pair is ERC20, ERC721TokenReceiver {
     uint256 public constant ONE = 1e18;
 
     address public immutable nft;
@@ -150,7 +150,21 @@ contract Pair is ERC20 {
 
         // transfer nfts from sender
         for (uint256 i = 0; i < tokenIds.length; i++) {
-            ERC721(nft).transferFrom(msg.sender, address(this), tokenIds[i]);
+            ERC721(nft).safeTransferFrom(msg.sender, address(this), tokenIds[i]);
+        }
+    }
+
+    function unwrap(uint256[] calldata tokenIds) public {
+        // ~~~~~~ Effects ~~~~~~ //
+
+        // burn fractional tokens from sender
+        _burn(msg.sender, tokenIds.length * ONE);
+
+        // ~~~~~~ Interactions ~~~~~~ //
+
+        // transfer nfts to sender
+        for (uint256 i = 0; i < tokenIds.length; i++) {
+            ERC721(nft).safeTransferFrom(address(this), msg.sender, tokenIds[i]);
         }
     }
 
