@@ -51,11 +51,11 @@ contract Pair is ERC20 {
 
         // ~~~~~~ Interactions ~~~~~~ //
 
-        // transfer base tokens in
-        ERC20(baseToken).transferFrom(msg.sender, address(this), baseTokenAmount);
-
         // mint lp tokens to sender
         LpToken(lpToken).mint(msg.sender, lpTokenAmount);
+
+        // transfer base tokens in
+        ERC20(baseToken).transferFrom(msg.sender, address(this), baseTokenAmount);
 
         return lpTokenAmount;
     }
@@ -100,6 +100,42 @@ contract Pair is ERC20 {
         ERC20(baseToken).transfer(msg.sender, outputAmount);
 
         return outputAmount;
+    }
+
+    function remove(uint256 lpTokenAmount, uint256 minBaseTokenOutputAmount, uint256 minFractionalTokenOutputAmount)
+        public
+        returns (uint256)
+    {
+        // calculate the output amounts
+        uint256 lpTokenSupply = ERC20(lpToken).totalSupply();
+        uint256 baseTokenOutputAmount = (baseTokenReserves() * lpTokenAmount) / lpTokenSupply;
+        uint256 fractionalTokenOutputAmount = (fractionalTokenReserves() * lpTokenAmount) / lpTokenSupply;
+
+        // ~~~~~~ Checks ~~~~~~ //
+
+        // check that the base token output amount is greater than the min amount
+        require(baseTokenOutputAmount >= minBaseTokenOutputAmount, "Slippage: base token amount out is too small");
+
+        // check that the fractional token output amount is greater than the min amount
+        require(
+            fractionalTokenOutputAmount >= minFractionalTokenOutputAmount,
+            "Slippage: fractional token amount out is too small"
+        );
+
+        // ~~~~~~ Effects ~~~~~~ //
+
+        // transfer fractional tokens to sender
+        _transferFrom(msg.sender, address(this), fractionalTokenOutputAmount);
+
+        // ~~~~~~ Interactions ~~~~~~ //
+
+        // transfer base tokens to sender
+        ERC20(baseToken).transfer(msg.sender, baseTokenOutputAmount);
+
+        // burn lp tokens from sender
+        LpToken(lpToken).burn(msg.sender, lpTokenAmount);
+
+        return 1;
     }
 
     // =================== //
