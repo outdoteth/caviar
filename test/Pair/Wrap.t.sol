@@ -7,7 +7,7 @@ import "forge-std/console.sol";
 import "../shared/Fixture.t.sol";
 import "../../src/Caviar.sol";
 
-contract AddTest is Fixture {
+contract WrapTest is Fixture {
     uint256[] public tokenIds;
 
     function setUp() public {

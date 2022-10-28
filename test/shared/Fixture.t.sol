@@ -2,13 +2,14 @@
 pragma solidity ^0.8.17;
 
 import "forge-std/Test.sol";
+import "solmate/tokens/ERC721.sol";
 
 import "../../src/Caviar.sol";
 import "../../src/Pair.sol";
 import "./mocks/MockERC721.sol";
 import "./mocks/MockERC20.sol";
 
-contract Fixture is Test {
+contract Fixture is Test, ERC721TokenReceiver {
     MockERC721 public bayc;
     MockERC20 public usd;
     LpToken public lpToken;
