@@ -182,7 +182,7 @@ contract Pair is ERC20, ERC721TokenReceiver {
     // ===== NFT AMM logic ===== //
     // ========================= //
 
-    function nftAdd(uint256[] calldata tokenIds, uint256 baseTokenAmount, uint256 minLpTokenAmount)
+    function nftAdd(uint256 baseTokenAmount, uint256[] calldata tokenIds, uint256 minLpTokenAmount)
         public
         returns (uint256)
     {
