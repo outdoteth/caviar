@@ -20,6 +20,9 @@ contract RemoveTest is Fixture {
 
         uint256 minLpTokenAmount = totalBaseTokenAmount * totalFractionalTokenAmount;
         totalLpTokenAmount = p.add(totalBaseTokenAmount, totalFractionalTokenAmount, minLpTokenAmount);
+
+        deal(address(ethPair), address(this), totalFractionalTokenAmount, true);
+        ethPair.add{value: totalBaseTokenAmount}(totalBaseTokenAmount, totalFractionalTokenAmount, minLpTokenAmount);
     }
 
     function testItReturnsBaseTokenAmountAndFractionalTokenAmount() public {
@@ -127,5 +130,30 @@ contract RemoveTest is Fixture {
         // act
         vm.expectRevert("Slippage: base token amount out");
         p.remove(lpTokenAmount, minBaseTokenOutputAmount, minFractionalTokenOutputAmount);
+    }
+
+    function testItTransfersEther() public {
+        // arrange
+        uint256 lpTokenAmount = totalLpTokenAmount / 2;
+        uint256 minBaseTokenOutputAmount = totalBaseTokenAmount / 2;
+        uint256 minFractionalTokenOutputAmount = totalFractionalTokenAmount / 2;
+        uint256 thisBalanceBefore = address(this).balance;
+        uint256 balanceBefore = address(ethPair).balance;
+
+        // act
+        ethPair.remove(lpTokenAmount, minBaseTokenOutputAmount, minFractionalTokenOutputAmount);
+
+        // assert
+        assertEq(
+            address(this).balance - thisBalanceBefore,
+            minBaseTokenOutputAmount,
+            "Should have transferred ether to sender"
+        );
+
+        assertEq(
+            balanceBefore - address(ethPair).balance,
+            minBaseTokenOutputAmount,
+            "Should have transferred ether from pair"
+        );
     }
 }

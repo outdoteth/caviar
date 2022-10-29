@@ -14,6 +14,7 @@ contract AddTest is Fixture {
     function setUp() public {
         deal(address(usd), address(this), baseTokenAmount, true);
         deal(address(p), address(this), fractionalTokenAmount, true);
+        deal(address(ethPair), address(this), fractionalTokenAmount, true);
 
         usd.approve(address(p), type(uint256).max);
     }
@@ -109,5 +110,68 @@ contract AddTest is Fixture {
         // act
         vm.expectRevert("Slippage: lp token amount out");
         p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount);
+    }
+
+    function testItRevertsIfValueIsNot0AndBaseTokenIsNot0() public {
+        // arrange
+        uint256 minLpTokenAmount = (baseTokenAmount * fractionalTokenAmount * 17);
+        baseTokenAmount = baseTokenAmount * 17;
+        fractionalTokenAmount = fractionalTokenAmount * 17;
+
+        // act
+        vm.expectRevert("Invalid ether input");
+        p.add{value: 0.1 ether}(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount);
+    }
+
+    function testItRevertsIfValueDoesNotMatchBaseTokenAmount() public {
+        // arrange
+        uint256 minLpTokenAmount = (baseTokenAmount * fractionalTokenAmount * 17);
+        baseTokenAmount = baseTokenAmount * 17;
+        fractionalTokenAmount = fractionalTokenAmount * 17;
+
+        // act
+        vm.expectRevert("Invalid ether input");
+        ethPair.add{value: baseTokenAmount - 1}(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount);
+    }
+
+    function testItTransfersEther() public {
+        // arrange
+        uint256 minLpTokenAmount = baseTokenAmount * fractionalTokenAmount;
+        uint256 balanceBefore = address(this).balance;
+
+        // act
+        ethPair.add{value: baseTokenAmount}(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount);
+
+        // assert
+        uint256 balanceAfter = address(this).balance;
+        assertEq(balanceBefore - balanceAfter, baseTokenAmount, "Should transferred ether from sender");
+        assertEq(address(ethPair).balance, baseTokenAmount, "Should have transferred ether to pair");
+    }
+
+    function testItMintsLpTokensAfterInitWithEther() public {
+        // arrange
+        uint256 minLpTokenAmount = baseTokenAmount * fractionalTokenAmount;
+        ethPair.add{value: baseTokenAmount}(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount); // initial add
+        uint256 lpTokenSupplyBefore = ethPairLpToken.totalSupply();
+
+        uint256 expectedLpTokenAmount = baseTokenAmount * fractionalTokenAmount * 17;
+        minLpTokenAmount = expectedLpTokenAmount;
+        baseTokenAmount = baseTokenAmount * 17;
+        fractionalTokenAmount = fractionalTokenAmount * 17;
+        deal(address(ethPair), babe, fractionalTokenAmount, true);
+
+        // act
+        vm.startPrank(babe);
+        deal(babe, baseTokenAmount);
+        uint256 lpTokenAmount =
+            ethPair.add{value: baseTokenAmount}(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount);
+        vm.stopPrank();
+
+        // assert
+        assertEq(lpTokenAmount, expectedLpTokenAmount, "Should have returned correct lp token amount");
+        assertEq(ethPairLpToken.balanceOf(babe), expectedLpTokenAmount, "Should have minted lp tokens");
+        assertEq(
+            ethPairLpToken.totalSupply() - lpTokenSupplyBefore, expectedLpTokenAmount, "Should have increased lp supply"
+        );
     }
 }
