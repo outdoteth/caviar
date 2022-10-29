@@ -8,11 +8,13 @@ import "../../src/Caviar.sol";
 import "../../src/Pair.sol";
 import "./mocks/MockERC721.sol";
 import "./mocks/MockERC20.sol";
+import "../../script/CreatePair.s.sol";
 
 contract Fixture is Test, ERC721TokenReceiver {
     MockERC721 public bayc;
     MockERC20 public usd;
 
+    CreatePairScript public createPairScript;
     Caviar public c;
     Pair public p;
     LpToken public lpToken;
@@ -22,15 +24,17 @@ contract Fixture is Test, ERC721TokenReceiver {
     address public babe = address(0xbabe);
 
     constructor() {
+        createPairScript = new CreatePairScript();
+
         c = new Caviar();
 
         bayc = new MockERC721("yeet", "YEET");
         usd = new MockERC20("us dollar", "USD");
 
-        p = c.create(address(bayc), address(usd));
+        p = c.create(address(bayc), address(usd), bytes32(0));
         lpToken = LpToken(p.lpToken());
 
-        ethPair = c.create(address(bayc), address(0));
+        ethPair = c.create(address(bayc), address(0), bytes32(0));
         ethPairLpToken = LpToken(ethPair.lpToken());
 
         vm.label(babe, "babe");

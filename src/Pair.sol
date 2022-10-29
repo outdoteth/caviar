@@ -4,6 +4,7 @@ pragma solidity ^0.8.17;
 import "solmate/tokens/ERC20.sol";
 import "solmate/tokens/ERC721.sol";
 import "solmate/utils/SafeTransferLib.sol";
+import "solmate/utils/MerkleProofLib.sol";
 import "openzeppelin/utils/math/Math.sol";
 import "forge-std/console.sol";
 
@@ -17,16 +18,19 @@ contract Pair is ERC20, ERC721TokenReceiver {
     address public immutable nft;
     address public immutable baseToken;
     address public immutable lpToken;
+    bytes32 public immutable merkleRoot;
 
     constructor(
         address _nft,
         address _baseToken,
+        bytes32 _merkleRoot,
         string memory pairSymbol,
         string memory nftName,
         string memory nftSymbol
     ) ERC20(string.concat(nftName, " fractional token"), string.concat("f", nftSymbol), 18) {
         nft = _nft;
-        baseToken = _baseToken; // set to be address(0) for native ETH
+        baseToken = _baseToken; // use address(0) for native ETH
+        merkleRoot = _merkleRoot;
         lpToken = address(new LpToken(string.concat(pairSymbol, " LP token"), string.concat("LP-", pairSymbol), 18));
     }
 
@@ -217,10 +221,14 @@ contract Pair is ERC20, ERC721TokenReceiver {
     //      NFT AMM logic      //
     // *********************** //
 
-    function nftAdd(uint256 baseTokenAmount, uint256[] calldata tokenIds, uint256 minLpTokenAmount)
-        public
-        returns (uint256)
-    {
+    function nftAdd(
+        uint256 baseTokenAmount,
+        uint256[] calldata tokenIds,
+        uint256 minLpTokenAmount,
+        bytes32[][] calldata proofs
+    ) public returns (uint256) {
+        _validateTokenIds(tokenIds, proofs);
+
         uint256 fractionalTokenAmount = wrap(tokenIds);
         uint256 lpTokenAmount = add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount);
 
@@ -299,5 +307,16 @@ contract Pair is ERC20, ERC721TokenReceiver {
         emit Transfer(from, to, amount);
 
         return true;
+    }
+
+    function _validateTokenIds(uint256[] calldata tokenIds, bytes32[][] calldata proofs) internal view {
+        // if merkle root is not set then all tokens are valid
+        if (merkleRoot == bytes23(0)) return;
+
+        // validate merkle proofs against merkle root
+        for (uint256 i = 0; i < tokenIds.length; i++) {
+            bool isValid = MerkleProofLib.verify(proofs[i], merkleRoot, keccak256(abi.encode(tokenIds[i])));
+            require(isValid, "Invalid merkle proof");
+        }
     }
 }

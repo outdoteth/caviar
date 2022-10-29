@@ -11,6 +11,7 @@ contract NftRemoveTest is Fixture {
     uint256 public totalBaseTokenAmount = 3.15e18;
     uint256 public totalLpTokenAmount;
     uint256[] public tokenIds;
+    bytes32[][] public proofs;
 
     function setUp() public {
         deal(address(usd), address(this), totalBaseTokenAmount, true);
@@ -23,7 +24,7 @@ contract NftRemoveTest is Fixture {
         usd.approve(address(p), type(uint256).max);
 
         uint256 minLpTokenAmount = totalBaseTokenAmount * tokenIds.length * 1e18;
-        totalLpTokenAmount = p.nftAdd(totalBaseTokenAmount, tokenIds, minLpTokenAmount);
+        totalLpTokenAmount = p.nftAdd(totalBaseTokenAmount, tokenIds, minLpTokenAmount, proofs);
 
         tokenIds.pop();
         tokenIds.pop();

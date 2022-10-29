@@ -6,6 +6,7 @@ import "forge-std/console.sol";
 
 import "../shared/Fixture.t.sol";
 import "../../src/Caviar.sol";
+import "../../script/CreatePair.s.sol";
 
 contract AddTest is Fixture {
     uint256 public baseTokenAmount = 100;
@@ -173,5 +174,14 @@ contract AddTest is Fixture {
         assertEq(
             ethPairLpToken.totalSupply() - lpTokenSupplyBefore, expectedLpTokenAmount, "Should have increased lp supply"
         );
+    }
+
+    function testItAddsWithMerkleProof() public {
+        Pair pair = createPairScript.create(address(bayc), address(usd), "YEET-mids.json", address(c));
+
+        uint256[] memory tokenIds = new uint256[](2);
+        tokenIds[0] = 4;
+        tokenIds[1] = 1;
+        createPairScript.generateMerkleProofs("YEET-mids.json", tokenIds);
     }
 }

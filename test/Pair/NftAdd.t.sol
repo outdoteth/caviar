@@ -10,6 +10,7 @@ import "../../src/Caviar.sol";
 contract NftAddTest is Fixture {
     uint256 public baseTokenAmount = 100 * 1e18;
     uint256[] public tokenIds;
+    bytes32[][] public proofs;
 
     function setUp() public {
         deal(address(usd), address(this), baseTokenAmount, true);
@@ -29,7 +30,7 @@ contract NftAddTest is Fixture {
         uint256 expectedLpTokenAmount = baseTokenAmount * tokenIds.length * 1e18;
 
         // act
-        uint256 lpTokenAmount = p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount);
+        uint256 lpTokenAmount = p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, proofs);
 
         // assert
         assertEq(lpTokenAmount, expectedLpTokenAmount, "Should have returned correct lp token amount");
@@ -43,7 +44,7 @@ contract NftAddTest is Fixture {
         uint256 balanceBefore = usd.balanceOf(address(this));
 
         // act
-        p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount);
+        p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, proofs);
 
         // assert
         uint256 balanceAfter = usd.balanceOf(address(this));
@@ -56,7 +57,7 @@ contract NftAddTest is Fixture {
         uint256 minLpTokenAmount = baseTokenAmount * tokenIds.length;
 
         // act
-        p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount);
+        p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, proofs);
 
         // assert
         for (uint256 i = 0; i < tokenIds.length; i++) {
@@ -70,7 +71,7 @@ contract NftAddTest is Fixture {
 
         // act
         vm.expectRevert("Slippage: lp token amount out");
-        p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount);
+        p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, proofs);
     }
 
     function testItMintsLpTokensAfterInit() public {
@@ -97,7 +98,7 @@ contract NftAddTest is Fixture {
         }
 
         // act
-        uint256 lpTokenAmount = p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount);
+        uint256 lpTokenAmount = p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, proofs);
         vm.stopPrank();
 
         // assert
@@ -118,6 +119,6 @@ contract NftAddTest is Fixture {
 
         // act
         vm.expectRevert("Slippage: lp token amount out");
-        p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount);
+        p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, proofs);
     }
 }
