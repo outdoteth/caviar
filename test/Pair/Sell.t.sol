@@ -8,12 +8,12 @@ import "../shared/Fixture.t.sol";
 import "../../src/Caviar.sol";
 
 contract SellTest is Fixture {
-    uint256 public inputAmount = 10;
+    uint256 public inputAmount = 0.337e18;
     uint256 public minOutputAmount;
 
     function setUp() public {
-        uint256 baseTokenAmount = 100;
-        uint256 fractionalTokenAmount = 30;
+        uint256 baseTokenAmount = 30.123e18;
+        uint256 fractionalTokenAmount = 99.99e18;
 
         deal(address(usd), address(this), baseTokenAmount, true);
         deal(address(p), address(this), fractionalTokenAmount, true);
@@ -23,7 +23,8 @@ contract SellTest is Fixture {
         uint256 minLpTokenAmount = baseTokenAmount * fractionalTokenAmount;
         p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount);
 
-        minOutputAmount = (inputAmount * p.fractionalTokenReserves()) / (p.baseTokenReserves() + inputAmount);
+        minOutputAmount =
+            (inputAmount * p.fractionalTokenReserves() * 997) / ((p.baseTokenReserves() + inputAmount) * 1000);
         deal(address(p), address(this), inputAmount, true);
 
         deal(address(ethPair), address(this), fractionalTokenAmount, true);

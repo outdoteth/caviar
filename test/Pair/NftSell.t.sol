@@ -12,8 +12,8 @@ contract NftSellTest is Fixture {
     uint256[] public tokenIds;
 
     function setUp() public {
-        uint256 baseTokenAmount = 100;
-        uint256 fractionalTokenAmount = 30;
+        uint256 baseTokenAmount = 69.69e18;
+        uint256 fractionalTokenAmount = 420.42e18;
 
         deal(address(usd), address(this), baseTokenAmount, true);
         deal(address(p), address(this), fractionalTokenAmount, true);
@@ -29,8 +29,8 @@ contract NftSellTest is Fixture {
 
         bayc.setApprovalForAll(address(p), true);
 
-        minOutputAmount =
-            (tokenIds.length * 1e18 * p.fractionalTokenReserves()) / (p.baseTokenReserves() + tokenIds.length * 1e18);
+        minOutputAmount = (tokenIds.length * 1e18 * p.fractionalTokenReserves() * 997)
+            / ((p.baseTokenReserves() + tokenIds.length * 1e18) * 1000);
     }
 
     function testItReturnsOutputAmount() public {

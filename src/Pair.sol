@@ -79,7 +79,7 @@ contract Pair is ERC20, ERC721TokenReceiver {
 
     function buy(uint256 outputAmount, uint256 maxInputAmount) public payable returns (uint256) {
         // calculate input amount using xyk invariant
-        uint256 inputAmount = (outputAmount * baseTokenReserves()) / (fractionalTokenReserves() - outputAmount);
+        uint256 inputAmount = buyQuote(outputAmount);
 
         // *** Checks *** //
 
@@ -110,7 +110,7 @@ contract Pair is ERC20, ERC721TokenReceiver {
 
     function sell(uint256 inputAmount, uint256 minOutputAmount) public returns (uint256) {
         // calculate output amount using xyk invariant
-        uint256 outputAmount = (inputAmount * fractionalTokenReserves()) / (baseTokenReserves() + inputAmount);
+        uint256 outputAmount = sellQuote(inputAmount);
 
         // *** Checks *** //
 
@@ -269,7 +269,11 @@ contract Pair is ERC20, ERC721TokenReceiver {
     }
 
     function buyQuote(uint256 outputAmount) public view returns (uint256) {
-        return (outputAmount * baseTokenReserves()) / (fractionalTokenReserves() - outputAmount);
+        return (outputAmount * baseTokenReserves() * 1000) / ((fractionalTokenReserves() - outputAmount) * 997);
+    }
+
+    function sellQuote(uint256 inputAmount) public view returns (uint256) {
+        return (inputAmount * fractionalTokenReserves() * 997) / ((baseTokenReserves() + inputAmount) * 1000);
     }
 
     function price() public view returns (uint256) {

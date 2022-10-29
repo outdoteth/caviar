@@ -29,7 +29,8 @@ contract NftBuyTest is Fixture {
         tokenIds.pop();
         tokenIds.pop();
         outputAmount = tokenIds.length * 1e18;
-        maxInputAmount = (outputAmount * p.baseTokenReserves()) / (p.fractionalTokenReserves() - outputAmount);
+        maxInputAmount =
+            (outputAmount * p.baseTokenReserves() * 1000) / ((p.fractionalTokenReserves() - outputAmount) * 997);
         deal(address(usd), address(this), maxInputAmount, true);
     }
 

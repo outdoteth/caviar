@@ -19,7 +19,7 @@ contract CreateTest is Fixture {
         assertTrue(pair != address(0), "Should have deployed pair");
     }
 
-    function testItSetsSymbols() public {
+    function testItSetsSymbolsAndNames() public {
         // arrange
         address nft = 0xbEEFB00b00000000000000000000000000000000;
         address baseToken = 0xCAFE000000000000000000000000000000000000;
