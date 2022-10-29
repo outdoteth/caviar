@@ -39,6 +39,8 @@ contract BuyTest is Fixture {
 
         // assert
         assertEq(inputAmount, expectedInputAmount, "Should have returned input amount");
+
+        console.log(usd.symbol());
     }
 
     function testItTransfersBaseTokens() public {
