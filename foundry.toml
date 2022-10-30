@@ -8,10 +8,14 @@ gas_reports = ["Pair", "Caviar", "LpToken"]
 fs_permissions = [{ access = "read", path = "./script/rankings/"}]
 ffi = true
 
-[profile.default.fuzz]
-runs = 256
-
 [fmt]
 line_length = 120
+
+[fuzz]
+runs = 256
+
+[profile.ci]
+ffi = false
+no_match_test = "MerkleProof"
 
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config
