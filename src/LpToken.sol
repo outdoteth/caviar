@@ -5,9 +5,9 @@ import "solmate/auth/Owned.sol";
 import "solmate/tokens/ERC20.sol";
 
 contract LpToken is Owned, ERC20 {
-    constructor(string memory _name, string memory _symbol, uint8 _decimals)
+    constructor(string memory pairSymbol)
         Owned(msg.sender)
-        ERC20(_name, _symbol, _decimals)
+        ERC20(string.concat(pairSymbol, " LP token"), string.concat("LP-", pairSymbol), 18)
     {}
 
     function mint(address to, uint256 amount) public onlyOwner {
