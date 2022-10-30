@@ -7,7 +7,6 @@ import "solmate/utils/SafeTransferLib.sol";
 import "solmate/utils/MerkleProofLib.sol";
 import "openzeppelin/utils/math/Math.sol";
 import "openzeppelin/utils/cryptography/MerkleProof.sol";
-import "forge-std/console.sol";
 
 import "./LpToken.sol";
 

@@ -2,7 +2,6 @@
 pragma solidity ^0.8.17;
 
 import "solmate/tokens/ERC20.sol";
-import "forge-std/console.sol";
 
 import "./Pair.sol";
 import "./lib/SafeERC20Namer.sol";
