@@ -175,13 +175,4 @@ contract AddTest is Fixture {
             ethPairLpToken.totalSupply() - lpTokenSupplyBefore, expectedLpTokenAmount, "Should have increased lp supply"
         );
     }
-
-    function testItAddsWithMerkleProof() public {
-        Pair pair = createPairScript.create(address(bayc), address(usd), "YEET-mids.json", address(c));
-
-        uint256[] memory tokenIds = new uint256[](2);
-        tokenIds[0] = 4;
-        tokenIds[1] = 1;
-        createPairScript.generateMerkleProofs("YEET-mids.json", tokenIds);
-    }
 }

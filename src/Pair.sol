@@ -6,6 +6,7 @@ import "solmate/tokens/ERC721.sol";
 import "solmate/utils/SafeTransferLib.sol";
 import "solmate/utils/MerkleProofLib.sol";
 import "openzeppelin/utils/math/Math.sol";
+import "openzeppelin/utils/cryptography/MerkleProof.sol";
 import "forge-std/console.sol";
 
 import "./LpToken.sol";
@@ -235,24 +236,38 @@ contract Pair is ERC20, ERC721TokenReceiver {
         return lpTokenAmount;
     }
 
-    function nftBuy(uint256[] calldata tokenIds, uint256 maxInputAmount) public returns (uint256) {
+    function nftBuy(uint256[] calldata tokenIds, uint256 maxInputAmount, bytes32[][] calldata proofs)
+        public
+        returns (uint256)
+    {
+        _validateTokenIds(tokenIds, proofs);
+
         uint256 inputAmount = buy(tokenIds.length * 1e18, maxInputAmount);
         unwrap(tokenIds);
 
         return inputAmount;
     }
 
-    function nftSell(uint256[] calldata tokenIds, uint256 minOutputAmount) public returns (uint256) {
+    function nftSell(uint256[] calldata tokenIds, uint256 minOutputAmount, bytes32[][] calldata proofs)
+        public
+        returns (uint256)
+    {
+        _validateTokenIds(tokenIds, proofs);
+
         uint256 inputAmount = wrap(tokenIds);
         uint256 outputAmount = sell(inputAmount, minOutputAmount);
 
         return outputAmount;
     }
 
-    function nftRemove(uint256 lpTokenAmount, uint256 minBaseTokenOutputAmount, uint256[] calldata tokenIds)
-        public
-        returns (uint256, uint256)
-    {
+    function nftRemove(
+        uint256 lpTokenAmount,
+        uint256 minBaseTokenOutputAmount,
+        uint256[] calldata tokenIds,
+        bytes32[][] calldata proofs
+    ) public returns (uint256, uint256) {
+        _validateTokenIds(tokenIds, proofs);
+
         (uint256 baseTokenOutputAmount, uint256 fractionalTokenOutputAmount) =
             remove(lpTokenAmount, minBaseTokenOutputAmount, tokenIds.length * 1e18);
         unwrap(tokenIds);
@@ -315,7 +330,7 @@ contract Pair is ERC20, ERC721TokenReceiver {
 
         // validate merkle proofs against merkle root
         for (uint256 i = 0; i < tokenIds.length; i++) {
-            bool isValid = MerkleProofLib.verify(proofs[i], merkleRoot, keccak256(abi.encode(tokenIds[i])));
+            bool isValid = MerkleProofLib.verify(proofs[i], merkleRoot, keccak256(abi.encodePacked(tokenIds[i])));
             require(isValid, "Invalid merkle proof");
         }
     }

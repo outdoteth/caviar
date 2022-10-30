@@ -5,9 +5,13 @@ const keccak256 = require("keccak256");
 const { defaultAbiCoder } = require("ethers/lib/utils");
 
 const generateMerkleProof = (tokenId, tokenIds) => {
-  const leaves = tokenIds.map((v) => keccak256(v));
+  const leaves = tokenIds.map((v) =>
+    keccak256(defaultAbiCoder.encode(["uint256"], [v]))
+  );
   const tree = new MerkleTree(leaves, keccak256, { sort: true });
-  const proof = tree.getHexProof(keccak256(parseInt(tokenId)));
+  const proof = tree.getHexProof(
+    keccak256(defaultAbiCoder.encode(["uint256"], [tokenId]))
+  );
 
   return proof;
 };

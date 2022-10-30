@@ -121,4 +121,21 @@ contract NftAddTest is Fixture {
         vm.expectRevert("Slippage: lp token amount out");
         p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, proofs);
     }
+
+    function testItAddsWithMerkleProof() public {
+        // arrange
+        Pair pair = createPairScript.create(address(bayc), address(usd), "YEET-mids.json", address(c));
+        proofs = createPairScript.generateMerkleProofs("YEET-mids.json", tokenIds);
+        uint256 minLpTokenAmount = tokenIds.length * 1e18 * baseTokenAmount;
+        bayc.setApprovalForAll(address(pair), true);
+        usd.approve(address(pair), type(uint256).max);
+
+        // act
+        pair.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, proofs);
+
+        // assert
+        for (uint256 i = 0; i < tokenIds.length; i++) {
+            assertEq(bayc.ownerOf(i), address(pair), "Should have sent bayc to pair");
+        }
+    }
 }

@@ -11,7 +11,10 @@ const generateMerkleRoot = (rankingFile) => {
     })
   );
 
-  const leaves = tokenIds.map((v) => keccak256(v));
+  const leaves = tokenIds.map((v) =>
+    keccak256(defaultAbiCoder.encode(["uint256"], [v]))
+  );
+
   const tree = new MerkleTree(leaves, keccak256, { sort: true });
   const root = tree.getHexRoot();
 
