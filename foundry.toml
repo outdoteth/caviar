@@ -6,6 +6,7 @@ solc = "0.8.17"
 optimizer_runs = 100_000
 gas_reports = ["Pair", "Caviar", "LpToken"]
 fs_permissions = [{ access = "read", path = "./script/rankings/"}]
+ffi = true
 
 [profile.default.fuzz]
 runs = 256
