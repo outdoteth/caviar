@@ -38,4 +38,29 @@ contract CreateTest is Fixture {
         assertEq(lpToken.symbol(), "LP-0xbeef:0xcafe", "Should have set lp symbol");
         assertEq(lpToken.name(), "0xbeef:0xcafe LP token", "Should have set lp name");
     }
+
+    function testItSavesPair() public {
+        // arrange
+        address nft = address(0xbeef);
+        address baseToken = address(0xcafe);
+        bytes32 merkleRoot = bytes32(uint256(0xb00b));
+
+        // act
+        address pair = address(c.create(nft, baseToken, merkleRoot));
+
+        // assert
+        assertEq(c.pairs(nft, baseToken, merkleRoot), pair, "Should have saved pair address in pairs");
+    }
+
+    function testItRevertsIfDeployingSamePairTwice() public {
+        // arrange
+        address nft = address(0xbeef);
+        address baseToken = address(0xcafe);
+        bytes32 merkleRoot = bytes32(uint256(0xb00b));
+        c.create(nft, baseToken, merkleRoot);
+
+        // act
+        vm.expectRevert("Pair already exists");
+        c.create(nft, baseToken, merkleRoot);
+    }
 }
