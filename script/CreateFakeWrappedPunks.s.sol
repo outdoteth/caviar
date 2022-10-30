@@ -5,7 +5,7 @@ import "forge-std/Script.sol";
 import "forge-std/console.sol";
 import "ERC721A/ERC721A.sol";
 
-contract FakePunks is ERC721A {
+contract FakeWrappedPunks is ERC721A {
     constructor() ERC721A("Fake Wrapped Cryptopunks", "FWPUNKS") {}
 
     function mint(address to, uint256 quantity) public {
@@ -17,21 +17,20 @@ contract FakePunks is ERC721A {
     }
 }
 
-contract CreateFakePunksScript is Script {
+contract CreateFakeWrappedPunksScript is Script {
     function setUp() public {}
 
     function run() public {
         vm.startBroadcast();
 
-        FakePunks fakePunks = new FakePunks();
-        console.log("fake punks:");
-        console.log(address(fakePunks));
+        FakeWrappedPunks fakeWrappedPunks = new FakeWrappedPunks();
+        console.log("fake wpunks:", address(fakeWrappedPunks));
 
-        fakePunks.mint(msg.sender, 250);
-        fakePunks.mint(msg.sender, 250);
-        fakePunks.mint(msg.sender, 250);
-        fakePunks.mint(msg.sender, 250);
-        fakePunks.mint(msg.sender, 250);
-        fakePunks.mint(msg.sender, 250);
+        fakeWrappedPunks.mint(msg.sender, 250);
+        fakeWrappedPunks.mint(msg.sender, 250);
+        fakeWrappedPunks.mint(msg.sender, 250);
+        fakeWrappedPunks.mint(msg.sender, 250);
+        fakeWrappedPunks.mint(msg.sender, 250);
+        fakeWrappedPunks.mint(msg.sender, 250);
     }
 }
