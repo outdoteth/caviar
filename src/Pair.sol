@@ -21,6 +21,13 @@ contract Pair is ERC20, ERC721TokenReceiver {
     address public immutable lpToken;
     bytes32 public immutable merkleRoot;
 
+    event Add(uint256 baseTokenAmount, uint256 fractionalTokenAmount, uint256 lpTokenAmount);
+    event Remove(uint256 baseTokenAmount, uint256 fractionalTokenAmount, uint256 lpTokenAmount);
+    event Buy(uint256 inputAmount, uint256 outputAmount);
+    event Sell(uint256 inputAmount, uint256 outputAmount);
+    event Wrap(uint256[] tokenIds);
+    event Unwrap(uint256[] tokenIds);
+
     constructor(
         address _nft,
         address _baseToken,
@@ -79,65 +86,9 @@ contract Pair is ERC20, ERC721TokenReceiver {
             ERC20(baseToken).transferFrom(msg.sender, address(this), baseTokenAmount);
         }
 
+        emit Add(baseTokenAmount, fractionalTokenAmount, lpTokenAmount);
+
         return lpTokenAmount;
-    }
-
-    function buy(uint256 outputAmount, uint256 maxInputAmount) public payable returns (uint256) {
-        // calculate input amount using xyk invariant
-        uint256 inputAmount = buyQuote(outputAmount);
-
-        // *** Checks *** //
-
-        // check that the required amount of base tokens is less than the max amount
-        require(inputAmount <= maxInputAmount, "Slippage: amount in");
-
-        // check that correct eth input was sent; if the baseToken equals address(0) then native ETH is used
-        require(baseToken == address(0) ? msg.value == maxInputAmount : msg.value == 0, "Invalid ether input");
-
-        // *** Effects *** //
-
-        // transfer fractional tokens to sender
-        _transferFrom(address(this), msg.sender, outputAmount);
-
-        // *** Interactions *** //
-
-        if (baseToken == address(0)) {
-            // refund surplus eth
-            uint256 refundAmount = maxInputAmount - inputAmount;
-            if (refundAmount > 0) msg.sender.safeTransferETH(maxInputAmount - inputAmount);
-        } else {
-            // transfer base tokens in
-            ERC20(baseToken).transferFrom(msg.sender, address(this), inputAmount);
-        }
-
-        return inputAmount;
-    }
-
-    function sell(uint256 inputAmount, uint256 minOutputAmount) public returns (uint256) {
-        // calculate output amount using xyk invariant
-        uint256 outputAmount = sellQuote(inputAmount);
-
-        // *** Checks *** //
-
-        // check that the outputted amount of fractional tokens is greater than the min amount
-        require(outputAmount >= minOutputAmount, "Slippage: amount out");
-
-        // *** Effects *** //
-
-        // transfer fractional tokens from sender
-        _transferFrom(msg.sender, address(this), inputAmount);
-
-        // *** Interactions *** //
-
-        if (baseToken == address(0)) {
-            // transfer ether out
-            msg.sender.safeTransferETH(outputAmount);
-        } else {
-            // transfer base tokens out
-            ERC20(baseToken).transfer(msg.sender, outputAmount);
-        }
-
-        return outputAmount;
     }
 
     function remove(uint256 lpTokenAmount, uint256 minBaseTokenOutputAmount, uint256 minFractionalTokenOutputAmount)
@@ -175,7 +126,71 @@ contract Pair is ERC20, ERC721TokenReceiver {
             ERC20(baseToken).transfer(msg.sender, baseTokenOutputAmount);
         }
 
+        emit Remove(baseTokenOutputAmount, fractionalTokenOutputAmount, lpTokenAmount);
+
         return (baseTokenOutputAmount, fractionalTokenOutputAmount);
+    }
+
+    function buy(uint256 outputAmount, uint256 maxInputAmount) public payable returns (uint256) {
+        // calculate input amount using xyk invariant
+        uint256 inputAmount = buyQuote(outputAmount);
+
+        // *** Checks *** //
+
+        // check that the required amount of base tokens is less than the max amount
+        require(inputAmount <= maxInputAmount, "Slippage: amount in");
+
+        // check that correct eth input was sent; if the baseToken equals address(0) then native ETH is used
+        require(baseToken == address(0) ? msg.value == maxInputAmount : msg.value == 0, "Invalid ether input");
+
+        // *** Effects *** //
+
+        // transfer fractional tokens to sender
+        _transferFrom(address(this), msg.sender, outputAmount);
+
+        // *** Interactions *** //
+
+        if (baseToken == address(0)) {
+            // refund surplus eth
+            uint256 refundAmount = maxInputAmount - inputAmount;
+            if (refundAmount > 0) msg.sender.safeTransferETH(maxInputAmount - inputAmount);
+        } else {
+            // transfer base tokens in
+            ERC20(baseToken).transferFrom(msg.sender, address(this), inputAmount);
+        }
+
+        emit Buy(inputAmount, outputAmount);
+
+        return inputAmount;
+    }
+
+    function sell(uint256 inputAmount, uint256 minOutputAmount) public returns (uint256) {
+        // calculate output amount using xyk invariant
+        uint256 outputAmount = sellQuote(inputAmount);
+
+        // *** Checks *** //
+
+        // check that the outputted amount of fractional tokens is greater than the min amount
+        require(outputAmount >= minOutputAmount, "Slippage: amount out");
+
+        // *** Effects *** //
+
+        // transfer fractional tokens from sender
+        _transferFrom(msg.sender, address(this), inputAmount);
+
+        // *** Interactions *** //
+
+        if (baseToken == address(0)) {
+            // transfer ether out
+            msg.sender.safeTransferETH(outputAmount);
+        } else {
+            // transfer base tokens out
+            ERC20(baseToken).transfer(msg.sender, outputAmount);
+        }
+
+        emit Sell(inputAmount, outputAmount);
+
+        return outputAmount;
     }
 
     // ******************** //
@@ -197,6 +212,8 @@ contract Pair is ERC20, ERC721TokenReceiver {
             ERC721(nft).safeTransferFrom(msg.sender, address(this), tokenIds[i]);
         }
 
+        emit Wrap(tokenIds);
+
         return fractionalTokenAmount;
     }
 
@@ -214,6 +231,8 @@ contract Pair is ERC20, ERC721TokenReceiver {
         for (uint256 i = 0; i < tokenIds.length; i++) {
             ERC721(nft).safeTransferFrom(address(this), msg.sender, tokenIds[i]);
         }
+
+        emit Unwrap(tokenIds);
 
         return fractionalTokenAmount;
     }

@@ -5,7 +5,7 @@ import "solmate/tokens/ERC20.sol";
 import "forge-std/console.sol";
 
 import "./Pair.sol";
-import "./SafeERC20Namer.sol";
+import "./lib/SafeERC20Namer.sol";
 
 contract Caviar {
     using SafeERC20Namer for address;
