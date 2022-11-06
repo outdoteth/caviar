@@ -245,7 +245,7 @@ contract Pair is ERC20, ERC721TokenReceiver {
         uint256[] calldata tokenIds,
         uint256 minLpTokenAmount,
         bytes32[][] calldata proofs
-    ) public returns (uint256) {
+    ) public payable returns (uint256) {
         _validateTokenIds(tokenIds, proofs);
 
         uint256 fractionalTokenAmount = wrap(tokenIds);
@@ -256,6 +256,7 @@ contract Pair is ERC20, ERC721TokenReceiver {
 
     function nftBuy(uint256[] calldata tokenIds, uint256 maxInputAmount, bytes32[][] calldata proofs)
         public
+        payable
         returns (uint256)
     {
         _validateTokenIds(tokenIds, proofs);
@@ -310,11 +311,11 @@ contract Pair is ERC20, ERC721TokenReceiver {
     }
 
     function buyQuote(uint256 outputAmount) public view returns (uint256) {
-        return (outputAmount * baseTokenReserves() * 1000) / ((fractionalTokenReserves() - outputAmount) * 997);
+        return (outputAmount * 1000 * baseTokenReserves()) / ((fractionalTokenReserves() - outputAmount) * 997);
     }
 
     function sellQuote(uint256 inputAmount) public view returns (uint256) {
-        return (inputAmount * fractionalTokenReserves() * 997) / ((baseTokenReserves() + inputAmount) * 1000);
+        return (inputAmount * 997 * baseTokenReserves()) / ((fractionalTokenReserves() * 1000) + (inputAmount * 997));
     }
 
     function price() public view returns (uint256) {
