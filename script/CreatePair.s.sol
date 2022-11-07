@@ -2,6 +2,7 @@
 pragma solidity ^0.8.17;
 
 import "forge-std/Script.sol";
+import "forge-std/console.sol";
 import "solmate/utils/LibString.sol";
 
 import "../src/Caviar.sol";
@@ -14,6 +15,11 @@ contract CreatePairScript is Script {
 
     function run() public {
         vm.broadcast();
+
+        address caviar = vm.envAddress("CAVIAR_ADDRESS");
+        address nft = vm.envAddress("NFT_ADDRESS");
+
+        create(nft, address(0), "bored-ape-yacht-club.json", caviar);
     }
 
     function create(address nft, address baseToken, string memory rankingFile, address caviar) public returns (Pair) {
@@ -22,6 +28,9 @@ contract CreatePairScript is Script {
 
         // create the pair
         Pair pair = Caviar(caviar).create(nft, baseToken, merkleRoot);
+        console.log("pair:", address(pair));
+        console.log("merkle root:");
+        console.logBytes32(merkleRoot);
 
         return pair;
     }
