@@ -31,44 +31,13 @@
       ]
     }
   ],
-  "receipts": [
-    {
-      "transactionHash": "0xd3ba504dec71c79432150ea95ffce2de9eaa92aa49cf676aa3ef2b949ef938f3",
-      "transactionIndex": "0x8",
-      "blockHash": "0x1944a865ce1c07b44252c8b3c750fc12d4e24d7cf25ad9feefc9692032172f92",
-      "blockNumber": "0x78ba6c",
-      "from": "0xE70989f0A6b50E3c8Ef6Df57e994E99AA79EbD27",
-      "to": "0xCBfe4B343728230e9e54552Bc4c61eb8c16605C9",
-      "cumulativeGasUsed": "0x39b42c",
-      "gasUsed": "0x343db4",
-      "contractAddress": null,
-      "logs": [
-        {
-          "address": "0xC1c480aB2b3dc77c9c337e2A19938DE3E9b2aABF",
-          "topics": [
-            "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0",
-            "0x0000000000000000000000000000000000000000000000000000000000000000",
-            "0x000000000000000000000000b4595c3f0844cb566c0df9fea7462a4c413c57fc"
-          ],
-          "data": "0x",
-          "blockHash": "0x1944a865ce1c07b44252c8b3c750fc12d4e24d7cf25ad9feefc9692032172f92",
-          "blockNumber": "0x78ba6c",
-          "transactionHash": "0xd3ba504dec71c79432150ea95ffce2de9eaa92aa49cf676aa3ef2b949ef938f3",
-          "transactionIndex": "0x8",
-          "logIndex": "0x6",
-          "removed": false
-        }
-      ],
-      "status": "0x1",
-      "logsBloom": "0x00000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000001000000000000000000000000000000000000020000400000000000020800000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000001000000000000000000020000000000000000080000000000000000000000000000000000000000000000000",
-      "type": "0x2",
-      "effectiveGasPrice": "0x23fbe3f40"
-    }
-  ],
+  "receipts": [],
   "libraries": [],
-  "pending": [],
+  "pending": [
+    "0xd3ba504dec71c79432150ea95ffce2de9eaa92aa49cf676aa3ef2b949ef938f3"
+  ],
   "path": "/Users/out/caviar/broadcast/CreatePair.s.sol/5/run-latest.json",
   "returns": {},
-  "timestamp": 1667862567,
+  "timestamp": 1667862541,
   "commit": "fe34ece"
 }

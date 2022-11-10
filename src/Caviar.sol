@@ -2,12 +2,15 @@
 pragma solidity ^0.8.17;
 
 import "solmate/tokens/ERC20.sol";
+import "solmate/auth/Owned.sol";
 
 import "./Pair.sol";
 import "./lib/SafeERC20Namer.sol";
 
-contract Caviar {
+contract Caviar is Owned {
     using SafeERC20Namer for address;
+
+    constructor() Owned(msg.sender) {}
 
     // pairs[nft][baseToken][merkleRoot] -> pair
     mapping(address => mapping(address => mapping(bytes32 => address))) public pairs;
@@ -27,5 +30,13 @@ contract Caviar {
         pairs[nft][baseToken][merkleRoot] = address(pair);
 
         return pair;
+    }
+
+    function destroy(address nft, address baseToken, bytes32 merkleRoot) public {
+        // check that a pair can only destroy itself
+        require(msg.sender == pairs[nft][baseToken][merkleRoot], "Only pair can destroy itself");
+
+        // delete the pair
+        delete pairs[nft][baseToken][merkleRoot];
     }
 }

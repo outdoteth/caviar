@@ -9,6 +9,7 @@ import "openzeppelin/utils/math/Math.sol";
 import "openzeppelin/utils/cryptography/MerkleProof.sol";
 
 import "./LpToken.sol";
+import "./Caviar.sol";
 
 contract Pair is ERC20, ERC721TokenReceiver {
     using SafeTransferLib for address;
@@ -19,6 +20,8 @@ contract Pair is ERC20, ERC721TokenReceiver {
     address public immutable baseToken;
     address public immutable lpToken;
     bytes32 public immutable merkleRoot;
+    address public immutable creator;
+    uint256 public closeTimestamp;
 
     event Add(uint256 baseTokenAmount, uint256 fractionalTokenAmount, uint256 lpTokenAmount);
     event Remove(uint256 baseTokenAmount, uint256 fractionalTokenAmount, uint256 lpTokenAmount);
@@ -39,6 +42,7 @@ contract Pair is ERC20, ERC721TokenReceiver {
         baseToken = _baseToken; // use address(0) for native ETH
         merkleRoot = _merkleRoot;
         lpToken = address(new LpToken(pairSymbol));
+        creator = msg.sender;
     }
 
     // ******************* //
@@ -197,6 +201,8 @@ contract Pair is ERC20, ERC721TokenReceiver {
     // ******************** //
 
     function wrap(uint256[] calldata tokenIds) public returns (uint256) {
+        require(closeTimestamp == 0, "Wrap: closed");
+
         uint256 fractionalTokenAmount = tokenIds.length * ONE;
 
         // *** Effects *** //
@@ -292,6 +298,25 @@ contract Pair is ERC20, ERC721TokenReceiver {
         unwrap(tokenIds);
 
         return (baseTokenOutputAmount, fractionalTokenOutputAmount);
+    }
+
+    // ****************************** //
+    //      Emergency exit logic      //
+    // ****************************** //
+
+    function exit() public {
+        require(Caviar(creator).owner() == msg.sender, "Exit: not creator");
+
+        closeTimestamp = block.timestamp;
+    }
+
+    // used to withdraw nfts in case of liquidity imbalance
+    function withdraw(uint256 tokenId) public {
+        require(Caviar(creator).owner() == msg.sender, "Withdraw: not creator");
+        require(closeTimestamp != 0, "Withdraw not initiated");
+        require(block.timestamp >= closeTimestamp + 1 days, "Not withdrawable yet");
+
+        ERC721(nft).safeTransferFrom(address(this), msg.sender, tokenId);
     }
 
     // ***************** //
