@@ -33,7 +33,7 @@ contract WrapTest is Fixture {
     function testCannotExitIfNotAdmin() public {
         // act
         vm.prank(address(0xbabe));
-        vm.expectRevert("Exit: not creator");
+        vm.expectRevert("Exit: not owner");
         p.exit();
 
         // assert
@@ -46,7 +46,7 @@ contract WrapTest is Fixture {
 
         // act
         vm.prank(address(0xbabe));
-        vm.expectRevert("Withdraw: not creator");
+        vm.expectRevert("Withdraw: not owner");
         p.withdraw(1);
     }
 

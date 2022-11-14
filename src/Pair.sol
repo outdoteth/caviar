@@ -305,14 +305,14 @@ contract Pair is ERC20, ERC721TokenReceiver {
     // ****************************** //
 
     function exit() public {
-        require(Caviar(creator).owner() == msg.sender, "Exit: not creator");
+        require(Caviar(creator).owner() == msg.sender, "Exit: not owner");
 
         closeTimestamp = block.timestamp;
     }
 
     // used to withdraw nfts in case of liquidity imbalance
     function withdraw(uint256 tokenId) public {
-        require(Caviar(creator).owner() == msg.sender, "Withdraw: not creator");
+        require(Caviar(creator).owner() == msg.sender, "Withdraw: not owner");
         require(closeTimestamp != 0, "Withdraw not initiated");
         require(block.timestamp >= closeTimestamp + 1 days, "Not withdrawable yet");
 
