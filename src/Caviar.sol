@@ -10,6 +10,8 @@ import "./lib/SafeERC20Namer.sol";
 contract Caviar is Owned {
     using SafeERC20Namer for address;
 
+    event Create(address indexed nft, address indexed baseToken, bytes32 merkleRoot);
+
     constructor() Owned(msg.sender) {}
 
     // pairs[nft][baseToken][merkleRoot] -> pair
@@ -28,6 +30,8 @@ contract Caviar is Owned {
 
         // save the pair
         pairs[nft][baseToken][merkleRoot] = address(pair);
+
+        emit Create(nft, baseToken, merkleRoot);
 
         return pair;
     }
