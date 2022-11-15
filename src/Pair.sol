@@ -11,10 +11,14 @@ import "openzeppelin/utils/cryptography/MerkleProof.sol";
 import "./LpToken.sol";
 import "./Caviar.sol";
 
+/// @title Pair
+/// @author out.eth (@outdoteth)
+/// @notice A pair of an NFT and a base token that can be used to create and trade fractionalized NFTs.
 contract Pair is ERC20, ERC721TokenReceiver {
     using SafeTransferLib for address;
 
     uint256 public constant ONE = 1e18;
+    uint256 public constant CLOSE_GRACE_PERIOD = 7 days;
 
     address public immutable nft;
     address public immutable baseToken;
@@ -49,14 +53,18 @@ contract Pair is ERC20, ERC721TokenReceiver {
     //      AMM logic      //
     // ******************  //
 
+    /// @notice Adds liquidity to the pair.
+    /// @param baseTokenAmount The amount of base tokens to add.
+    /// @param fractionalTokenAmount The amount of fractional tokens to add.
+    /// @param minLpTokenAmount The minimum amount of LP tokens to mint.
+    /// @return lpTokenAmount The amount of LP tokens minted.
     function add(uint256 baseTokenAmount, uint256 fractionalTokenAmount, uint256 minLpTokenAmount)
         public
         payable
-        returns (uint256)
+        returns (uint256 lpTokenAmount)
     {
         // calculate the lp token shares to mint
         uint256 lpTokenSupply = ERC20(lpToken).totalSupply();
-        uint256 lpTokenAmount;
         if (lpTokenSupply > 0) {
             uint256 baseTokenShare = (baseTokenAmount * lpTokenSupply) / baseTokenReserves();
             uint256 fractionalTokenShare = (fractionalTokenAmount * lpTokenSupply) / fractionalTokenReserves();
@@ -90,18 +98,22 @@ contract Pair is ERC20, ERC721TokenReceiver {
         }
 
         emit Add(baseTokenAmount, fractionalTokenAmount, lpTokenAmount);
-
-        return lpTokenAmount;
     }
 
+    /// @notice Removes liquidity from the pair.
+    /// @param lpTokenAmount The amount of LP tokens to burn.
+    /// @param minBaseTokenOutputAmount The minimum amount of base tokens to receive.
+    /// @param minFractionalTokenOutputAmount The minimum amount of fractional tokens to receive.
+    /// @return baseTokenOutputAmount The amount of base tokens received.
+    /// @return fractionalTokenOutputAmount The amount of fractional tokens received.
     function remove(uint256 lpTokenAmount, uint256 minBaseTokenOutputAmount, uint256 minFractionalTokenOutputAmount)
         public
-        returns (uint256, uint256)
+        returns (uint256 baseTokenOutputAmount, uint256 fractionalTokenOutputAmount)
     {
         // calculate the output amounts
         uint256 lpTokenSupply = ERC20(lpToken).totalSupply();
-        uint256 baseTokenOutputAmount = (baseTokenReserves() * lpTokenAmount) / lpTokenSupply;
-        uint256 fractionalTokenOutputAmount = (fractionalTokenReserves() * lpTokenAmount) / lpTokenSupply;
+        baseTokenOutputAmount = (baseTokenReserves() * lpTokenAmount) / lpTokenSupply;
+        fractionalTokenOutputAmount = (fractionalTokenReserves() * lpTokenAmount) / lpTokenSupply;
 
         // *** Checks *** //
 
@@ -130,13 +142,15 @@ contract Pair is ERC20, ERC721TokenReceiver {
         }
 
         emit Remove(baseTokenOutputAmount, fractionalTokenOutputAmount, lpTokenAmount);
-
-        return (baseTokenOutputAmount, fractionalTokenOutputAmount);
     }
 
-    function buy(uint256 outputAmount, uint256 maxInputAmount) public payable returns (uint256) {
+    /// @notice Buys fractional tokens from the pair.
+    /// @param outputAmount The amount of fractional tokens to buy.
+    /// @param maxInputAmount The maximum amount of base tokens to spend.
+    /// @return inputAmount The amount of base tokens spent.
+    function buy(uint256 outputAmount, uint256 maxInputAmount) public payable returns (uint256 inputAmount) {
         // calculate input amount using xyk invariant
-        uint256 inputAmount = buyQuote(outputAmount);
+        inputAmount = buyQuote(outputAmount);
 
         // *** Checks *** //
 
@@ -163,13 +177,15 @@ contract Pair is ERC20, ERC721TokenReceiver {
         }
 
         emit Buy(inputAmount, outputAmount);
-
-        return inputAmount;
     }
 
-    function sell(uint256 inputAmount, uint256 minOutputAmount) public returns (uint256) {
+    /// @notice Sells fractional tokens to the pair.
+    /// @param inputAmount The amount of fractional tokens to sell.
+    /// @param minOutputAmount The minimum amount of base tokens to receive.
+    /// @return outputAmount The amount of base tokens received.
+    function sell(uint256 inputAmount, uint256 minOutputAmount) public returns (uint256 outputAmount) {
         // calculate output amount using xyk invariant
-        uint256 outputAmount = sellQuote(inputAmount);
+        outputAmount = sellQuote(inputAmount);
 
         // *** Checks *** //
 
@@ -192,18 +208,19 @@ contract Pair is ERC20, ERC721TokenReceiver {
         }
 
         emit Sell(inputAmount, outputAmount);
-
-        return outputAmount;
     }
 
     // ******************** //
     //      Wrap logic      //
     // ******************** //
 
-    function wrap(uint256[] calldata tokenIds) public returns (uint256) {
+    /// @notice Wraps NFTs into fractional tokens.
+    /// @param tokenIds The ids of the NFTs to wrap.
+    /// @return fractionalTokenAmount The amount of fractional tokens minted.
+    function wrap(uint256[] calldata tokenIds) public returns (uint256 fractionalTokenAmount) {
         require(closeTimestamp == 0, "Wrap: closed");
 
-        uint256 fractionalTokenAmount = tokenIds.length * ONE;
+        fractionalTokenAmount = tokenIds.length * ONE;
 
         // *** Effects *** //
 
@@ -218,12 +235,13 @@ contract Pair is ERC20, ERC721TokenReceiver {
         }
 
         emit Wrap(tokenIds);
-
-        return fractionalTokenAmount;
     }
 
-    function unwrap(uint256[] calldata tokenIds) public returns (uint256) {
-        uint256 fractionalTokenAmount = tokenIds.length * ONE;
+    /// @notice Unwraps fractional tokens into NFTs.
+    /// @param tokenIds The ids of the NFTs to unwrap.
+    /// @return fractionalTokenAmount The amount of fractional tokens burned.
+    function unwrap(uint256[] calldata tokenIds) public returns (uint256 fractionalTokenAmount) {
+        fractionalTokenAmount = tokenIds.length * ONE;
 
         // *** Effects *** //
 
@@ -238,82 +256,102 @@ contract Pair is ERC20, ERC721TokenReceiver {
         }
 
         emit Unwrap(tokenIds);
-
-        return fractionalTokenAmount;
     }
 
     // *********************** //
     //      NFT AMM logic      //
     // *********************** //
 
+    /// @notice nftAdd Adds liquidity to the pair using NFTs.
+    /// @param baseTokenAmount The amount of base tokens to add.
+    /// @param tokenIds The ids of the NFTs to add.
+    /// @param minLpTokenAmount The minimum amount of lp tokens to receive.
+    /// @param proofs The merkle proofs for the NFTs.
+    /// @return lpTokenAmount The amount of lp tokens minted.
     function nftAdd(
         uint256 baseTokenAmount,
         uint256[] calldata tokenIds,
         uint256 minLpTokenAmount,
         bytes32[][] calldata proofs
-    ) public payable returns (uint256) {
+    ) public payable returns (uint256 lpTokenAmount) {
         _validateTokenIds(tokenIds, proofs);
 
         uint256 fractionalTokenAmount = wrap(tokenIds);
-        uint256 lpTokenAmount = add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount);
-
-        return lpTokenAmount;
+        lpTokenAmount = add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount);
     }
 
+    /// @notice nftBuy Buys NFTs from the pair using base tokens.
+    /// @param tokenIds The ids of the NFTs to buy.
+    /// @param maxInputAmount The maximum amount of base tokens to spend.
+    /// @param proofs The merkle proofs for the NFTs.
+    /// @return inputAmount The amount of base tokens spent.
     function nftBuy(uint256[] calldata tokenIds, uint256 maxInputAmount, bytes32[][] calldata proofs)
         public
         payable
-        returns (uint256)
+        returns (uint256 inputAmount)
     {
         _validateTokenIds(tokenIds, proofs);
 
-        uint256 inputAmount = buy(tokenIds.length * 1e18, maxInputAmount);
+        inputAmount = buy(tokenIds.length * 1e18, maxInputAmount);
         unwrap(tokenIds);
-
-        return inputAmount;
     }
 
+    /// @notice nftSell Sells NFTs to the pair for base tokens.
+    /// @param tokenIds The ids of the NFTs to sell.
+    /// @param minOutputAmount The minimum amount of base tokens to receive.
+    /// @param proofs The merkle proofs for the NFTs.
+    /// @return outputAmount The amount of base tokens received.
     function nftSell(uint256[] calldata tokenIds, uint256 minOutputAmount, bytes32[][] calldata proofs)
         public
-        returns (uint256)
+        returns (uint256 outputAmount)
     {
         _validateTokenIds(tokenIds, proofs);
 
         uint256 inputAmount = wrap(tokenIds);
-        uint256 outputAmount = sell(inputAmount, minOutputAmount);
-
-        return outputAmount;
+        outputAmount = sell(inputAmount, minOutputAmount);
     }
 
+    /// @notice nftRemove Removes liquidity from the pair using NFTs.
+    /// @param lpTokenAmount The amount of lp tokens to remove.
+    /// @param minBaseTokenOutputAmount The minimum amount of base tokens to receive.
+    /// @param tokenIds The ids of the NFTs to remove.
+    /// @param proofs The merkle proofs for the NFTs.
+    /// @return baseTokenOutputAmount The amount of base tokens received.
+    /// @return fractionalTokenOutputAmount The amount of fractional tokens received.
     function nftRemove(
         uint256 lpTokenAmount,
         uint256 minBaseTokenOutputAmount,
         uint256[] calldata tokenIds,
         bytes32[][] calldata proofs
-    ) public returns (uint256, uint256) {
+    ) public returns (uint256 baseTokenOutputAmount, uint256 fractionalTokenOutputAmount) {
         _validateTokenIds(tokenIds, proofs);
 
-        (uint256 baseTokenOutputAmount, uint256 fractionalTokenOutputAmount) =
+        (baseTokenOutputAmount, fractionalTokenOutputAmount) =
             remove(lpTokenAmount, minBaseTokenOutputAmount, tokenIds.length * 1e18);
         unwrap(tokenIds);
-
-        return (baseTokenOutputAmount, fractionalTokenOutputAmount);
     }
 
     // ****************************** //
     //      Emergency exit logic      //
     // ****************************** //
 
+    /// @notice Closes the pair to new wraps.
+    /// @dev Can only be called by the caviar owner. This is used as an emergency exit in case
+    ///      the caviar owner suspects that the pair has been compromised.
     function close() public {
         require(caviar.owner() == msg.sender, "Close: not owner");
 
-        closeTimestamp = block.timestamp + 1 days;
+        closeTimestamp = block.timestamp + CLOSE_GRACE_PERIOD;
 
         // remove the pair from the Caviar contract
         caviar.destroy(nft, baseToken, merkleRoot);
     }
 
-    // used to withdraw nfts in case of liquidity imbalance
+    /// @notice Withdraws a particular NFT from the pair.
+    /// @dev Can only be called by the caviar owner after the close grace period has passed. This
+    ///      is used to auction off the NFTs in the pair in case NFTs get stuck due to liquidity
+    ///      imbalances. Proceeds from the auction are distributed pro rata to fractional token
+    ///      holders. See documentation for more details.
     function withdraw(uint256 tokenId) public {
         require(caviar.owner() == msg.sender, "Withdraw: not owner");
         require(closeTimestamp != 0, "Withdraw not initiated");
@@ -334,14 +372,25 @@ contract Pair is ERC20, ERC721TokenReceiver {
         return balanceOf[address(this)];
     }
 
+    /// @notice The amount of base tokens required to buy a given amount of fractional tokens.
+    /// @dev Calculated using the xyk invariant and a 30bps fee.
+    /// @param outputAmount The amount of fractional tokens to buy.
+    /// @return inputAmount The amount of base tokens required.
     function buyQuote(uint256 outputAmount) public view returns (uint256) {
         return (outputAmount * 1000 * baseTokenReserves()) / ((fractionalTokenReserves() - outputAmount) * 997);
     }
 
+    /// @notice The amount of base tokens received for selling a given amount of fractional tokens.
+    /// @dev Calculated using the xyk invariant and a 30bps fee.
+    /// @param inputAmount The amount of fractional tokens to sell.
+    /// @return outputAmount The amount of base tokens received.
     function sellQuote(uint256 inputAmount) public view returns (uint256) {
         return (inputAmount * 997 * baseTokenReserves()) / ((fractionalTokenReserves() * 1000) + (inputAmount * 997));
     }
 
+    /// @notice The current price of one fractional token in base tokens.
+    /// @dev Calculated by dividing the base token reserves by the fractional token reserves.
+    /// @return price The price of one fractional token in base tokens.
     function price() public view returns (uint256) {
         uint256 baseTokenBalance = ERC20(baseToken).balanceOf(address(this));
         uint256 fractionalTokenBalance = ERC20(address(this)).balanceOf(address(this));

@@ -4,9 +4,9 @@ pragma solidity ^0.8.17;
 import "solmate/auth/Owned.sol";
 import "solmate/tokens/ERC20.sol";
 
-/// @title LP Token
+/// @title LP token
 /// @author out.eth (@outdoteth)
-/// @notice LP Token which is minted and burned by the Pair contract to represent liquidity in the pool.
+/// @notice LP token which is minted and burned by the Pair contract to represent liquidity in the pool.
 contract LpToken is Owned, ERC20 {
     constructor(string memory pairSymbol)
         Owned(msg.sender)
