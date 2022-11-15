@@ -18,7 +18,7 @@ contract RemoveTest is Fixture {
 
         usd.approve(address(p), type(uint256).max);
 
-        uint256 minLpTokenAmount = totalBaseTokenAmount * totalFractionalTokenAmount;
+        uint256 minLpTokenAmount = Math.sqrt(totalBaseTokenAmount * totalFractionalTokenAmount);
         totalLpTokenAmount = p.add(totalBaseTokenAmount, totalFractionalTokenAmount, minLpTokenAmount);
 
         deal(address(ethPair), address(this), totalFractionalTokenAmount, true);

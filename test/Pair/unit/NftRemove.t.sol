@@ -23,7 +23,7 @@ contract NftRemoveTest is Fixture {
         bayc.setApprovalForAll(address(p), true);
         usd.approve(address(p), type(uint256).max);
 
-        uint256 minLpTokenAmount = totalBaseTokenAmount * tokenIds.length * 1e18;
+        uint256 minLpTokenAmount = Math.sqrt(totalBaseTokenAmount * tokenIds.length * 1e18);
         totalLpTokenAmount = p.nftAdd(totalBaseTokenAmount, tokenIds, minLpTokenAmount, proofs);
 
         tokenIds.pop();
@@ -140,7 +140,7 @@ contract NftRemoveTest is Fixture {
         bayc.setApprovalForAll(address(pair), true);
         usd.approve(address(pair), type(uint256).max);
 
-        uint256 minLpTokenAmount = totalBaseTokenAmount * tokenIds.length * 1e18;
+        uint256 minLpTokenAmount = Math.sqrt(totalBaseTokenAmount * tokenIds.length * 1e18);
         totalLpTokenAmount = pair.nftAdd(totalBaseTokenAmount, tokenIds, minLpTokenAmount, proofs);
 
         tokenIds.pop();

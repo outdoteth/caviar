@@ -71,7 +71,7 @@ contract Pair is ERC20, ERC721TokenReceiver {
             lpTokenAmount = Math.min(baseTokenShare, fractionalTokenShare);
         } else {
             // if there is no liquidity then init
-            lpTokenAmount = baseTokenAmount * fractionalTokenAmount;
+            lpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount);
         }
 
         // *** Checks *** //

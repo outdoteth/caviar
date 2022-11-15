@@ -20,7 +20,7 @@ contract NftSellTest is Fixture {
         deal(address(p), address(this), fractionalTokenAmount, true);
         usd.approve(address(p), type(uint256).max);
 
-        uint256 minLpTokenAmount = baseTokenAmount * fractionalTokenAmount;
+        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount);
         p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount);
 
         for (uint256 i = 0; i < 5; i++) {
@@ -111,7 +111,7 @@ contract NftSellTest is Fixture {
         deal(address(pair), address(this), fractionalTokenAmount, true);
         usd.approve(address(pair), type(uint256).max);
 
-        uint256 minLpTokenAmount = baseTokenAmount * fractionalTokenAmount;
+        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount);
         pair.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount);
 
         proofs = createPairScript.generateMerkleProofs("YEET-mids.json", tokenIds);
