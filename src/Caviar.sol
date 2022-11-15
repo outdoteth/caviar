@@ -7,16 +7,27 @@ import "solmate/auth/Owned.sol";
 import "./Pair.sol";
 import "./lib/SafeERC20Namer.sol";
 
+/// @title caviar.sh
+/// @author out.eth (@outdoteth)
+/// @notice An AMM for creating and trading fractionalized NFTs.
 contract Caviar is Owned {
     using SafeERC20Namer for address;
 
+    /// @param nft The NFT contract address.
+    /// @param baseToken The base token contract address.
+    /// @param merkleRoot The merkle root for the valid tokenIds.
     event Create(address indexed nft, address indexed baseToken, bytes32 merkleRoot);
 
     constructor() Owned(msg.sender) {}
 
-    // pairs[nft][baseToken][merkleRoot] -> pair
+    /// @dev pairs[nft][baseToken][merkleRoot] -> pair
     mapping(address => mapping(address => mapping(bytes32 => address))) public pairs;
 
+    /// @notice Creates a new pair.
+    /// @param nft The NFT contract address.
+    /// @param baseToken The base token contract address.
+    /// @param merkleRoot The merkle root for the valid tokenIds.
+    /// @return pair The address of the new pair.
     function create(address nft, address baseToken, bytes32 merkleRoot) public returns (Pair) {
         // check that the pair doesn't already exist
         require(pairs[nft][baseToken][merkleRoot] == address(0), "Pair already exists");
@@ -36,6 +47,10 @@ contract Caviar is Owned {
         return pair;
     }
 
+    /// @notice Deletes the pair for the given NFT, base token, and merkle root.
+    /// @param nft The NFT contract address.
+    /// @param baseToken The base token contract address.
+    /// @param merkleRoot The merkle root for the valid tokenIds.
     function destroy(address nft, address baseToken, bytes32 merkleRoot) public {
         // check that a pair can only destroy itself
         require(msg.sender == pairs[nft][baseToken][merkleRoot], "Only pair can destroy itself");

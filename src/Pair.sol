@@ -304,10 +304,10 @@ contract Pair is ERC20, ERC721TokenReceiver {
     //      Emergency exit logic      //
     // ****************************** //
 
-    function exit() public {
-        require(caviar.owner() == msg.sender, "Exit: not owner");
+    function close() public {
+        require(caviar.owner() == msg.sender, "Close: not owner");
 
-        closeTimestamp = block.timestamp;
+        closeTimestamp = block.timestamp + 1 days;
 
         // remove the pair from the Caviar contract
         caviar.destroy(nft, baseToken, merkleRoot);
@@ -317,7 +317,7 @@ contract Pair is ERC20, ERC721TokenReceiver {
     function withdraw(uint256 tokenId) public {
         require(caviar.owner() == msg.sender, "Withdraw: not owner");
         require(closeTimestamp != 0, "Withdraw not initiated");
-        require(block.timestamp >= closeTimestamp + 1 days, "Not withdrawable yet");
+        require(block.timestamp >= closeTimestamp, "Not withdrawable yet");
 
         ERC721(nft).safeTransferFrom(address(this), msg.sender, tokenId);
     }
@@ -325,10 +325,6 @@ contract Pair is ERC20, ERC721TokenReceiver {
     // ***************** //
     //      Getters      //
     // ***************** //
-
-    function _baseTokenReserves() internal view returns (uint256) {
-        return baseToken == address(0) ? address(this).balance - msg.value : ERC20(baseToken).balanceOf(address(this));
-    }
 
     function baseTokenReserves() public view returns (uint256) {
         return _baseTokenReserves();
@@ -380,5 +376,9 @@ contract Pair is ERC20, ERC721TokenReceiver {
             bool isValid = MerkleProofLib.verify(proofs[i], merkleRoot, keccak256(abi.encodePacked(tokenIds[i])));
             require(isValid, "Invalid merkle proof");
         }
+    }
+
+    function _baseTokenReserves() internal view returns (uint256) {
+        return baseToken == address(0) ? address(this).balance - msg.value : ERC20(baseToken).balanceOf(address(this));
     }
 }
