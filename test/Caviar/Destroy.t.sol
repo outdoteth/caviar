@@ -16,9 +16,15 @@ contract DestroyTest is Fixture {
     function setUp() public {
         prankedAddress = address(0xbabe);
 
-        stdstore.target(address(c)).sig("pairs(address,address,bytes32)").with_key(address(this)).with_key(
-            address(this)
-        ).with_key(bytes32(0)).depth(0).checked_write(prankedAddress);
+        // forgefmt: disable-next-item
+        stdstore
+            .target(address(c))
+            .sig("pairs(address,address,bytes32)")
+            .with_key(address(this))
+            .with_key(address(this))
+            .with_key(bytes32(0))
+            .depth(0)
+            .checked_write(prankedAddress);
     }
 
     function testItRemovesPairFromMapping() public {
@@ -50,9 +56,15 @@ contract DestroyTest is Fixture {
         public
     {
         // arrange
-        stdstore.target(address(c)).sig("pairs(address,address,bytes32)").with_key(nft).with_key(baseToken).with_key(
-            merkleRoot
-        ).depth(0).checked_write(_prankedAddress);
+        // forgefmt: disable-next-item
+        stdstore
+            .target(address(c))
+            .sig("pairs(address,address,bytes32)")
+            .with_key(nft)
+            .with_key(baseToken)
+            .with_key(merkleRoot)
+            .depth(0)
+            .checked_write(_prankedAddress);
 
         // act
         vm.prank(_prankedAddress);
