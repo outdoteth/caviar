@@ -16,12 +16,12 @@ contract Caviar is Owned {
     /// @param nft The NFT contract address.
     /// @param baseToken The base token contract address.
     /// @param merkleRoot The merkle root for the valid tokenIds.
-    event Create(address indexed nft, address indexed baseToken, bytes32 merkleRoot);
+    event Create(address indexed nft, address indexed baseToken, bytes32 indexed merkleRoot);
 
     /// @param nft The NFT contract address.
     /// @param baseToken The base token contract address.
     /// @param merkleRoot The merkle root for the valid tokenIds.
-    event Destroy(address indexed nft, address indexed baseToken, bytes32 merkleRoot);
+    event Destroy(address indexed nft, address indexed baseToken, bytes32 indexed merkleRoot);
 
     /// @dev pairs[nft][baseToken][merkleRoot] -> pair
     mapping(address => mapping(address => mapping(bytes32 => address))) public pairs;
