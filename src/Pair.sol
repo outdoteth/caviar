@@ -21,7 +21,7 @@ contract Pair is ERC20, ERC721TokenReceiver {
     uint256 public constant CLOSE_GRACE_PERIOD = 7 days;
 
     address public immutable nft;
-    address public immutable baseToken;
+    address public immutable baseToken; // address(0) for ETH
     address public immutable lpToken;
     bytes32 public immutable merkleRoot;
     Caviar public immutable caviar;
@@ -33,6 +33,8 @@ contract Pair is ERC20, ERC721TokenReceiver {
     event Sell(uint256 inputAmount, uint256 outputAmount);
     event Wrap(uint256[] tokenIds);
     event Unwrap(uint256[] tokenIds);
+    event Close(uint256 closeTimestamp);
+    event Withdraw(uint256 tokenId);
 
     constructor(
         address _nft,
@@ -84,6 +86,7 @@ contract Pair is ERC20, ERC721TokenReceiver {
         // mint lp tokens to sender
         LpToken(lpToken).mint(msg.sender, lpTokenAmount);
 
+        // transfer base tokens in if the base token is not ETH
         if (baseToken != address(0)) {
             // transfer base tokens in
             ERC20(baseToken).transferFrom(msg.sender, address(this), baseTokenAmount);
@@ -139,7 +142,7 @@ contract Pair is ERC20, ERC721TokenReceiver {
     /// @param maxInputAmount The maximum amount of base tokens to spend.
     /// @return inputAmount The amount of base tokens spent.
     function buy(uint256 outputAmount, uint256 maxInputAmount) public payable returns (uint256 inputAmount) {
-        // calculate input amount using xyk invariant
+        // calculate required input amount using xyk invariant
         inputAmount = buyQuote(outputAmount);
 
         // *** Checks *** //
@@ -335,19 +338,24 @@ contract Pair is ERC20, ERC721TokenReceiver {
 
         // remove the pair from the Caviar contract
         caviar.destroy(nft, baseToken, merkleRoot);
+
+        emit Close(closeTimestamp);
     }
 
     /// @notice Withdraws a particular NFT from the pair.
     /// @dev Can only be called by the caviar owner after the close grace period has passed. This
     ///      is used to auction off the NFTs in the pair in case NFTs get stuck due to liquidity
-    ///      imbalances. Proceeds from the auction are distributed pro rata to fractional token
-    ///      holders. See documentation for more details.
+    ///      imbalances. Proceeds from the auction should be distributed pro rata to fractional
+    ///      token holders. See documentation for more details.
     function withdraw(uint256 tokenId) public {
         require(caviar.owner() == msg.sender, "Withdraw: not owner");
         require(closeTimestamp != 0, "Withdraw not initiated");
         require(block.timestamp >= closeTimestamp, "Not withdrawable yet");
 
+        // transfer the nft to the caviar owner
         ERC721(nft).safeTransferFrom(address(this), msg.sender, tokenId);
+
+        emit Withdraw(tokenId);
     }
 
     // ***************** //
@@ -449,6 +457,8 @@ contract Pair is ERC20, ERC721TokenReceiver {
     }
 
     function _baseTokenReserves() internal view returns (uint256) {
-        return baseToken == address(0) ? address(this).balance - msg.value : ERC20(baseToken).balanceOf(address(this));
+        return baseToken == address(0)
+            ? address(this).balance - msg.value // subtract the msg.value if the base token is ETH
+            : ERC20(baseToken).balanceOf(address(this));
     }
 }
