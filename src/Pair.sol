@@ -64,15 +64,7 @@ contract Pair is ERC20, ERC721TokenReceiver {
         returns (uint256 lpTokenAmount)
     {
         // calculate the lp token shares to mint
-        uint256 lpTokenSupply = ERC20(lpToken).totalSupply();
-        if (lpTokenSupply > 0) {
-            uint256 baseTokenShare = (baseTokenAmount * lpTokenSupply) / baseTokenReserves();
-            uint256 fractionalTokenShare = (fractionalTokenAmount * lpTokenSupply) / fractionalTokenReserves();
-            lpTokenAmount = Math.min(baseTokenShare, fractionalTokenShare);
-        } else {
-            // if there is no liquidity then init
-            lpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount);
-        }
+        lpTokenAmount = addQuote(baseTokenAmount, fractionalTokenAmount);
 
         // *** Checks *** //
 
@@ -111,9 +103,7 @@ contract Pair is ERC20, ERC721TokenReceiver {
         returns (uint256 baseTokenOutputAmount, uint256 fractionalTokenOutputAmount)
     {
         // calculate the output amounts
-        uint256 lpTokenSupply = ERC20(lpToken).totalSupply();
-        baseTokenOutputAmount = (baseTokenReserves() * lpTokenAmount) / lpTokenSupply;
-        fractionalTokenOutputAmount = (fractionalTokenReserves() * lpTokenAmount) / lpTokenSupply;
+        (baseTokenOutputAmount, fractionalTokenOutputAmount) = removeQuote(lpTokenAmount);
 
         // *** Checks *** //
 
@@ -386,6 +376,37 @@ contract Pair is ERC20, ERC721TokenReceiver {
     /// @return outputAmount The amount of base tokens received.
     function sellQuote(uint256 inputAmount) public view returns (uint256) {
         return (inputAmount * 997 * baseTokenReserves()) / ((fractionalTokenReserves() * 1000) + (inputAmount * 997));
+    }
+
+    /// @notice The amount of lp tokens received for adding a given amount of base tokens and fractional tokens.
+    /// @dev Calculated as a share of existing deposits. If there are no existing deposits, then initializes to
+    ///      sqrt(baseTokenAmount * fractionalTokenAmount).
+    /// @param baseTokenAmount The amount of base tokens to add.
+    /// @param fractionalTokenAmount The amount of fractional tokens to add.
+    /// @return lpTokenAmount The amount of lp tokens received.
+    function addQuote(uint256 baseTokenAmount, uint256 fractionalTokenAmount) public view returns (uint256) {
+        uint256 lpTokenSupply = ERC20(lpToken).totalSupply();
+        if (lpTokenSupply > 0) {
+            uint256 baseTokenShare = (baseTokenAmount * lpTokenSupply) / baseTokenReserves();
+            uint256 fractionalTokenShare = (fractionalTokenAmount * lpTokenSupply) / fractionalTokenReserves();
+            return Math.min(baseTokenShare, fractionalTokenShare);
+        } else {
+            // if there is no liquidity then init
+            return Math.sqrt(baseTokenAmount * fractionalTokenAmount);
+        }
+    }
+
+    /// @notice The amount of base tokens and fractional tokens received for burning a given amount of lp tokens.
+    /// @dev Calculated as a share of existing deposits.
+    /// @param lpTokenAmount The amount of lp tokens to burn.
+    /// @return baseTokenAmount The amount of base tokens received.
+    /// @return fractionalTokenAmount The amount of fractional tokens received.
+    function removeQuote(uint256 lpTokenAmount) public view returns (uint256, uint256) {
+        uint256 lpTokenSupply = ERC20(lpToken).totalSupply();
+        uint256 baseTokenOutputAmount = (baseTokenReserves() * lpTokenAmount) / lpTokenSupply;
+        uint256 fractionalTokenOutputAmount = (fractionalTokenReserves() * lpTokenAmount) / lpTokenSupply;
+
+        return (baseTokenOutputAmount, fractionalTokenOutputAmount);
     }
 
     /// @notice The current price of one fractional token in base tokens.
