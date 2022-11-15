@@ -4,8 +4,8 @@ pragma solidity ^0.8.17;
 import "forge-std/Test.sol";
 import "forge-std/console.sol";
 
-import "../shared/Fixture.t.sol";
-import "../../src/Caviar.sol";
+import "../../shared/Fixture.t.sol";
+import "../../../src/Caviar.sol";
 
 contract SellTest is Fixture {
     uint256 public inputAmount = 0.337e18;

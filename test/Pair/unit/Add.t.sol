@@ -4,9 +4,9 @@ pragma solidity ^0.8.17;
 import "forge-std/Test.sol";
 import "forge-std/console.sol";
 
-import "../shared/Fixture.t.sol";
-import "../../src/Caviar.sol";
-import "../../script/CreatePair.s.sol";
+import "../../shared/Fixture.t.sol";
+import "../../../src/Caviar.sol";
+import "../../../script/CreatePair.s.sol";
 
 contract AddTest is Fixture {
     uint256 public baseTokenAmount = 100;

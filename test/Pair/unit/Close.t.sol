@@ -4,10 +4,10 @@ pragma solidity ^0.8.17;
 import "forge-std/Test.sol";
 import "forge-std/console.sol";
 
-import "../shared/Fixture.t.sol";
-import "../../src/Caviar.sol";
+import "../../shared/Fixture.t.sol";
+import "../../../src/Caviar.sol";
 
-contract WrapTest is Fixture {
+contract CloseTest is Fixture {
     uint256[] public tokenIds;
 
     function setUp() public {
@@ -21,10 +21,10 @@ contract WrapTest is Fixture {
 
     function testExitSetsCloseTimestamp() public {
         // arrange
-        uint256 expectedCloseTimestamp = block.timestamp;
+        uint256 expectedCloseTimestamp = block.timestamp + 7 days;
 
         // act
-        p.exit();
+        p.close();
 
         // assert
         assertEq(p.closeTimestamp(), expectedCloseTimestamp, "Should have set close timestamp");
@@ -33,8 +33,8 @@ contract WrapTest is Fixture {
     function testCannotExitIfNotAdmin() public {
         // act
         vm.prank(address(0xbabe));
-        vm.expectRevert("Exit: not owner");
-        p.exit();
+        vm.expectRevert("Close: not owner");
+        p.close();
 
         // assert
         assertEq(p.closeTimestamp(), 0, "Should not have set close timestamp");
@@ -42,7 +42,7 @@ contract WrapTest is Fixture {
 
     function testCannotWithdrawIfNotAdmin() public {
         // arrange
-        p.exit();
+        p.close();
 
         // act
         vm.prank(address(0xbabe));
@@ -58,7 +58,7 @@ contract WrapTest is Fixture {
 
     function testCannotWithdrawIfNotEnoughTimeElapsed() public {
         // arrange
-        p.exit();
+        p.close();
 
         // act
         vm.expectRevert("Not withdrawable yet");
@@ -67,8 +67,8 @@ contract WrapTest is Fixture {
 
     function testItTransfersNftsAfterWithdraw() public {
         // arrange
-        p.exit();
-        skip(1 days);
+        p.close();
+        skip(7 days);
         uint256 tokenId = 1;
         bayc.transferFrom(address(this), address(p), tokenId);
 
