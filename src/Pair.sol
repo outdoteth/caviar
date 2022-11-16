@@ -373,6 +373,13 @@ contract Pair is ERC20, ERC721TokenReceiver {
         return balanceOf[address(this)];
     }
 
+    /// @notice The current price of one fractional token in base tokens with 18 decimals of precision.
+    /// @dev Calculated by dividing the base token reserves by the fractional token reserves.
+    /// @return price The price of one fractional token in base tokens * 1e18.
+    function price() public view returns (uint256) {
+        return (_baseTokenReserves() * ONE) / fractionalTokenReserves();
+    }
+
     /// @notice The amount of base tokens required to buy a given amount of fractional tokens.
     /// @dev Calculated using the xyk invariant and a 30bps fee.
     /// @param outputAmount The amount of fractional tokens to buy.
@@ -422,16 +429,6 @@ contract Pair is ERC20, ERC721TokenReceiver {
         uint256 fractionalTokenOutputAmount = (fractionalTokenReserves() * lpTokenAmount) / lpTokenSupply;
 
         return (baseTokenOutputAmount, fractionalTokenOutputAmount);
-    }
-
-    /// @notice The current price of one fractional token in base tokens.
-    /// @dev Calculated by dividing the base token reserves by the fractional token reserves.
-    /// @return price The price of one fractional token in base tokens.
-    function price() public view returns (uint256) {
-        uint256 baseTokenBalance = ERC20(baseToken).balanceOf(address(this));
-        uint256 fractionalTokenBalance = ERC20(address(this)).balanceOf(address(this));
-
-        return (baseTokenBalance * ONE) / fractionalTokenBalance;
     }
 
     // ************************ //

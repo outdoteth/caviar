@@ -23,7 +23,6 @@ contract DestroyTest is Fixture {
             .with_key(address(this))
             .with_key(address(this))
             .with_key(bytes32(0))
-            .depth(0)
             .checked_write(prankedAddress);
     }
 
