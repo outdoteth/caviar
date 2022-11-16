@@ -54,9 +54,9 @@ contract Pair is ERC20, ERC721TokenReceiver {
         caviar = Caviar(msg.sender);
     }
 
-    // ******************* //
-    //      AMM logic      //
-    // ******************  //
+    // ************************ //
+    //      Core AMM logic      //
+    // ***********************  //
 
     /// @notice Adds liquidity to the pair.
     /// @param baseTokenAmount The amount of base tokens to add.
@@ -212,6 +212,9 @@ contract Pair is ERC20, ERC721TokenReceiver {
     // ******************** //
     //      Wrap logic      //
     // ******************** //
+
+    // TODO: Add merkle proof logic here for wrapping
+    // TODO: Move merkle proof checks into the wrap function
 
     /// @notice Wraps NFTs into fractional tokens.
     /// @param tokenIds The ids of the NFTs to wrap.

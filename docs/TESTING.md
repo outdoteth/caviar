@@ -16,14 +16,14 @@ forge test --gas-report
 forge coverage
 ```
 
-To generate a more detailed line-by-line report you will need lcov installed.
+To generate a more detailed line-by-line report you will need [lcov](https://github.com/linux-test-project/lcov) installed.
 It should be installed by default on linux. To install on OSX:
 
 ```
 brew install lcov
 ```
 
-To generate the report:
+Generate the report:
 
 ```
 forge coverage --report lcov && genhtml lcov.info -o coverage && open coverage/index.html
