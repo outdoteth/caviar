@@ -8,6 +8,8 @@ import "solmate/utils/MerkleProofLib.sol";
 import "openzeppelin/utils/math/Math.sol";
 import "openzeppelin/utils/cryptography/MerkleProof.sol";
 
+import "forge-std/console.sol";
+
 import "./LpToken.sol";
 import "./Caviar.sol";
 
@@ -66,6 +68,8 @@ contract Pair is ERC20, ERC721TokenReceiver {
         returns (uint256 lpTokenAmount)
     {
         // *** Checks *** //
+
+        // check the token amount inputs are not zero
         require(baseTokenAmount > 0 && fractionalTokenAmount > 0, "Input token amount is zero");
 
         // calculate the lp token shares to mint
@@ -74,7 +78,7 @@ contract Pair is ERC20, ERC721TokenReceiver {
         // check that the amount of lp tokens outputted is greater than the min amount
         require(lpTokenAmount >= minLpTokenAmount, "Slippage: lp token amount out");
 
-        // check that correct eth input was sent; if the baseToken equals address(0) then native ETH is used
+        // check that correct eth input was sent - if the baseToken equals address(0) then native ETH is used
         require(baseToken == address(0) ? msg.value == baseTokenAmount : msg.value == 0, "Invalid ether input");
 
         // *** Effects *** //
