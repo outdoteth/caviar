@@ -43,8 +43,8 @@ contract Fixture is Test, ERC721TokenReceiver {
         vm.label(address(usd), "usd");
         vm.label(address(p), "pair");
         vm.label(address(lpToken), "LP-token");
-        vm.label(address(p), "ethPair");
-        vm.label(address(lpToken), "ethPair-LP-token");
+        vm.label(address(ethPair), "ethPair");
+        vm.label(address(ethPairLpToken), "ethPair-LP-token");
     }
 
     receive() external payable {}

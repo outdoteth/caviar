@@ -65,10 +65,11 @@ contract Pair is ERC20, ERC721TokenReceiver {
         payable
         returns (uint256 lpTokenAmount)
     {
+        // *** Checks *** //
+        require(baseTokenAmount > 0 && fractionalTokenAmount > 0, "Input token amount is zero");
+
         // calculate the lp token shares to mint
         lpTokenAmount = addQuote(baseTokenAmount, fractionalTokenAmount);
-
-        // *** Checks *** //
 
         // check that the amount of lp tokens outputted is greater than the min amount
         require(lpTokenAmount >= minLpTokenAmount, "Slippage: lp token amount out");
@@ -211,11 +212,12 @@ contract Pair is ERC20, ERC721TokenReceiver {
     /// @param tokenIds The ids of the NFTs to wrap.
     /// @return fractionalTokenAmount The amount of fractional tokens minted.
     function wrap(uint256[] calldata tokenIds) public returns (uint256 fractionalTokenAmount) {
+        fractionalTokenAmount = tokenIds.length * ONE;
+
         // *** Checks *** //
 
+        // check that wrapping is not closed
         require(closeTimestamp == 0, "Wrap: closed");
-
-        fractionalTokenAmount = tokenIds.length * ONE;
 
         // *** Effects *** //
 
@@ -270,40 +272,8 @@ contract Pair is ERC20, ERC721TokenReceiver {
         bytes32[][] calldata proofs
     ) public payable returns (uint256 lpTokenAmount) {
         _validateTokenIds(tokenIds, proofs);
-
         uint256 fractionalTokenAmount = wrap(tokenIds);
         lpTokenAmount = add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount);
-    }
-
-    /// @notice nftBuy Buys NFTs from the pair using base tokens.
-    /// @param tokenIds The ids of the NFTs to buy.
-    /// @param maxInputAmount The maximum amount of base tokens to spend.
-    /// @param proofs The merkle proofs for the NFTs.
-    /// @return inputAmount The amount of base tokens spent.
-    function nftBuy(uint256[] calldata tokenIds, uint256 maxInputAmount, bytes32[][] calldata proofs)
-        public
-        payable
-        returns (uint256 inputAmount)
-    {
-        _validateTokenIds(tokenIds, proofs);
-
-        inputAmount = buy(tokenIds.length * 1e18, maxInputAmount);
-        unwrap(tokenIds);
-    }
-
-    /// @notice nftSell Sells NFTs to the pair for base tokens.
-    /// @param tokenIds The ids of the NFTs to sell.
-    /// @param minOutputAmount The minimum amount of base tokens to receive.
-    /// @param proofs The merkle proofs for the NFTs.
-    /// @return outputAmount The amount of base tokens received.
-    function nftSell(uint256[] calldata tokenIds, uint256 minOutputAmount, bytes32[][] calldata proofs)
-        public
-        returns (uint256 outputAmount)
-    {
-        _validateTokenIds(tokenIds, proofs);
-
-        uint256 inputAmount = wrap(tokenIds);
-        outputAmount = sell(inputAmount, minOutputAmount);
     }
 
     /// @notice nftRemove Removes liquidity from the pair using NFTs.
@@ -320,10 +290,38 @@ contract Pair is ERC20, ERC721TokenReceiver {
         bytes32[][] calldata proofs
     ) public returns (uint256 baseTokenOutputAmount, uint256 fractionalTokenOutputAmount) {
         _validateTokenIds(tokenIds, proofs);
-
         (baseTokenOutputAmount, fractionalTokenOutputAmount) =
             remove(lpTokenAmount, minBaseTokenOutputAmount, tokenIds.length * 1e18);
         unwrap(tokenIds);
+    }
+
+    /// @notice nftBuy Buys NFTs from the pair using base tokens.
+    /// @param tokenIds The ids of the NFTs to buy.
+    /// @param maxInputAmount The maximum amount of base tokens to spend.
+    /// @param proofs The merkle proofs for the NFTs.
+    /// @return inputAmount The amount of base tokens spent.
+    function nftBuy(uint256[] calldata tokenIds, uint256 maxInputAmount, bytes32[][] calldata proofs)
+        public
+        payable
+        returns (uint256 inputAmount)
+    {
+        _validateTokenIds(tokenIds, proofs);
+        inputAmount = buy(tokenIds.length * 1e18, maxInputAmount);
+        unwrap(tokenIds);
+    }
+
+    /// @notice nftSell Sells NFTs to the pair for base tokens.
+    /// @param tokenIds The ids of the NFTs to sell.
+    /// @param minOutputAmount The minimum amount of base tokens to receive.
+    /// @param proofs The merkle proofs for the NFTs.
+    /// @return outputAmount The amount of base tokens received.
+    function nftSell(uint256[] calldata tokenIds, uint256 minOutputAmount, bytes32[][] calldata proofs)
+        public
+        returns (uint256 outputAmount)
+    {
+        _validateTokenIds(tokenIds, proofs);
+        uint256 inputAmount = wrap(tokenIds);
+        outputAmount = sell(inputAmount, minOutputAmount);
     }
 
     // ****************************** //
@@ -448,6 +446,8 @@ contract Pair is ERC20, ERC721TokenReceiver {
         return true;
     }
 
+    /// @dev Validates that the given tokenIds are valid for the contract's merkle root. Reverts
+    ///      if any of the tokenId proofs are invalid.
     function _validateTokenIds(uint256[] calldata tokenIds, bytes32[][] calldata proofs) internal view {
         // if merkle root is not set then all tokens are valid
         if (merkleRoot == bytes23(0)) return;
@@ -459,6 +459,9 @@ contract Pair is ERC20, ERC721TokenReceiver {
         }
     }
 
+    /// @dev Returns the current base token reserves. If the base token is ETH then it ignores
+    ///      the msg.value that is being sent in the current call context - this is to ensure the
+    ///      xyk math is correct in the buy() and add() functions.
     function _baseTokenReserves() internal view returns (uint256) {
         return baseToken == address(0)
             ? address(this).balance - msg.value // subtract the msg.value if the base token is ETH

@@ -9,6 +9,8 @@ import "../../../src/Caviar.sol";
 import "../../../script/CreatePair.s.sol";
 
 contract AddTest is Fixture {
+    event Add(uint256 baseTokenAmount, uint256 fractionalTokenAmount, uint256 lpTokenAmount);
+
     uint256 public baseTokenAmount = 100;
     uint256 public fractionalTokenAmount = 30;
 
@@ -174,5 +176,71 @@ contract AddTest is Fixture {
         assertEq(
             ethPairLpToken.totalSupply() - lpTokenSupplyBefore, expectedLpTokenAmount, "Should have increased lp supply"
         );
+    }
+
+    function testItEmitsAddEvent() public {
+        // arrange
+        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount);
+
+        // act
+        vm.expectEmit(true, true, true, true);
+        emit Add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount);
+        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount);
+    }
+
+    function testItRevertsIfAmountIsZero() public {
+        // act
+        vm.expectRevert("Input token amount is zero");
+        p.add(0, fractionalTokenAmount, 0);
+
+        vm.expectRevert("Input token amount is zero");
+        p.add(baseTokenAmount, 0, 0);
+    }
+
+    function testItInitMintsLpTokensToSender(uint256 _baseTokenAmount, uint256 _fractionalTokenAmount) public {
+        // arrange
+        _baseTokenAmount = bound(_baseTokenAmount, 1, type(uint128).max);
+        _fractionalTokenAmount = bound(_fractionalTokenAmount, 1, 100_000_000 * 1e18);
+        deal(address(usd), address(this), _baseTokenAmount, true);
+        deal(address(p), address(this), _fractionalTokenAmount, true);
+        uint256 minLpTokenAmount = Math.sqrt(_baseTokenAmount * _fractionalTokenAmount);
+        uint256 expectedLpTokenAmount = minLpTokenAmount;
+
+        // act
+        uint256 lpTokenAmount = p.add(_baseTokenAmount, _fractionalTokenAmount, minLpTokenAmount);
+
+        // assert
+        assertEq(lpTokenAmount, expectedLpTokenAmount, "Should have returned correct lp token amount");
+        assertEq(lpToken.balanceOf(address(this)), expectedLpTokenAmount, "Should have minted lp tokens");
+        assertEq(lpToken.totalSupply(), expectedLpTokenAmount, "Should have increased lp supply");
+    }
+
+    function testItMintsLpTokensAfterInit(uint256 _initBaseTokenAmount, uint256 _initFractionalTokenAmount) public {
+        // arrange
+        _initBaseTokenAmount = bound(_initBaseTokenAmount, 1, type(uint128).max);
+        _initFractionalTokenAmount = bound(_initFractionalTokenAmount, 1, 100_000_000 * 1e18);
+        deal(address(usd), address(this), _initBaseTokenAmount, true);
+        deal(address(p), address(this), _initFractionalTokenAmount, true);
+        uint256 initMinLpTokenAmount = Math.sqrt(_initBaseTokenAmount * _initFractionalTokenAmount);
+        p.add(_initBaseTokenAmount, _initFractionalTokenAmount, initMinLpTokenAmount); // initial add
+        uint256 lpTokenSupplyBefore = lpToken.totalSupply();
+
+        uint256 expectedLpTokenAmount = Math.sqrt(_initBaseTokenAmount * _initFractionalTokenAmount) * 17;
+        uint256 minLpTokenAmount = expectedLpTokenAmount;
+        baseTokenAmount = _initBaseTokenAmount * 17;
+        fractionalTokenAmount = _initFractionalTokenAmount * 17;
+        deal(address(usd), babe, baseTokenAmount, true);
+        deal(address(p), babe, fractionalTokenAmount, true);
+
+        // act
+        vm.startPrank(babe);
+        usd.approve(address(p), type(uint256).max);
+        uint256 lpTokenAmount = p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount);
+        vm.stopPrank();
+
+        // assert
+        assertEq(lpTokenAmount, expectedLpTokenAmount, "Should have returned correct lp token amount");
+        assertEq(lpToken.balanceOf(babe), expectedLpTokenAmount, "Should have minted lp tokens");
+        assertEq(lpToken.totalSupply() - lpTokenSupplyBefore, expectedLpTokenAmount, "Should have increased lp supply");
     }
 }
