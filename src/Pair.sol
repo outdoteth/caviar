@@ -216,8 +216,6 @@ contract Pair is ERC20, ERC721TokenReceiver {
     /// @param tokenIds The ids of the NFTs to wrap.
     /// @return fractionalTokenAmount The amount of fractional tokens minted.
     function wrap(uint256[] calldata tokenIds) public returns (uint256 fractionalTokenAmount) {
-        fractionalTokenAmount = tokenIds.length * ONE;
-
         // *** Checks *** //
 
         // check that wrapping is not closed
@@ -226,6 +224,7 @@ contract Pair is ERC20, ERC721TokenReceiver {
         // *** Effects *** //
 
         // mint fractional tokens to sender
+        fractionalTokenAmount = tokenIds.length * ONE;
         _mint(msg.sender, fractionalTokenAmount);
 
         // *** Interactions *** //
@@ -242,11 +241,10 @@ contract Pair is ERC20, ERC721TokenReceiver {
     /// @param tokenIds The ids of the NFTs to unwrap.
     /// @return fractionalTokenAmount The amount of fractional tokens burned.
     function unwrap(uint256[] calldata tokenIds) public returns (uint256 fractionalTokenAmount) {
-        fractionalTokenAmount = tokenIds.length * ONE;
-
         // *** Effects *** //
 
         // burn fractional tokens from sender
+        fractionalTokenAmount = tokenIds.length * ONE;
         _burn(msg.sender, fractionalTokenAmount);
 
         // *** Interactions *** //
@@ -399,6 +397,9 @@ contract Pair is ERC20, ERC721TokenReceiver {
     function addQuote(uint256 baseTokenAmount, uint256 fractionalTokenAmount) public view returns (uint256) {
         uint256 lpTokenSupply = lpToken.totalSupply();
         if (lpTokenSupply > 0) {
+            console.log("baseTokenReserves", baseTokenReserves());
+            console.log("fractionalTokenReserves", fractionalTokenReserves());
+
             // calculate amount of lp tokens as a fraction of existing reserves
             uint256 baseTokenShare = (baseTokenAmount * lpTokenSupply) / baseTokenReserves();
             uint256 fractionalTokenShare = (fractionalTokenAmount * lpTokenSupply) / fractionalTokenReserves();

@@ -8,6 +8,8 @@ import "../../shared/Fixture.t.sol";
 import "../../../src/Caviar.sol";
 
 contract BuyTest is Fixture {
+    event Buy(uint256 inputAmount, uint256 outputAmount);
+
     uint256 public outputAmount = 0.1e18;
     uint256 public maxInputAmount;
 
@@ -133,5 +135,12 @@ contract BuyTest is Fixture {
         // act
         vm.expectRevert("Invalid ether input");
         ethPair.buy{value: maxInputAmount + 100}(outputAmount, maxInputAmount);
+    }
+
+    function testItEmitsBuyEvent() public {
+        // act
+        vm.expectEmit(true, true, true, true);
+        emit Buy(maxInputAmount, outputAmount);
+        p.buy(outputAmount, maxInputAmount);
     }
 }

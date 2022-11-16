@@ -8,6 +8,8 @@ import "../../shared/Fixture.t.sol";
 import "../../../src/Caviar.sol";
 
 contract WrapTest is Fixture {
+    event Wrap(uint256[] tokenIds);
+
     uint256[] public tokenIds;
 
     function setUp() public {
@@ -39,5 +41,12 @@ contract WrapTest is Fixture {
         // assert
         assertEq(p.balanceOf(address(this)), expectedFractionalTokens, "Should have minted fractional tokens to sender");
         assertEq(p.totalSupply(), expectedFractionalTokens, "Should have minted fractional tokens");
+    }
+
+    function testItEmitsWrapEvent() public {
+        // act
+        vm.expectEmit(true, true, true, true);
+        emit Wrap(tokenIds);
+        p.wrap(tokenIds);
     }
 }

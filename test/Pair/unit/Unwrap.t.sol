@@ -8,6 +8,8 @@ import "../../shared/Fixture.t.sol";
 import "../../../src/Caviar.sol";
 
 contract UnwrapTest is Fixture {
+    event Unwrap(uint256[] tokenIds);
+
     uint256[] public tokenIds;
 
     function setUp() public {
@@ -50,5 +52,12 @@ contract UnwrapTest is Fixture {
         assertEq(
             totalSupplyBefore - p.totalSupply(), expectedFractionalTokensBurned, "Should have burned fractional tokens"
         );
+    }
+
+    function testItEmitsUnwrapEvent() public {
+        // act
+        vm.expectEmit(true, true, true, true);
+        emit Unwrap(tokenIds);
+        p.unwrap(tokenIds);
     }
 }

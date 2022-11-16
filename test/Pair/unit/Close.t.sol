@@ -8,6 +8,9 @@ import "../../shared/Fixture.t.sol";
 import "../../../src/Caviar.sol";
 
 contract CloseTest is Fixture {
+    event Close(uint256 closeTimestamp);
+    event Withdraw(uint256 tokenId);
+
     uint256[] public tokenIds;
 
     function setUp() public {
@@ -77,5 +80,25 @@ contract CloseTest is Fixture {
 
         // assert
         assertEq(bayc.ownerOf(tokenId), address(this), "Should have sent bayc to sender");
+    }
+
+    function testItEmitsCloseEvent() public {
+        // act
+        vm.expectEmit(true, true, true, true);
+        emit Close(block.timestamp + 7 days);
+        p.close();
+    }
+
+    function testItEmitsWithdrawEvent() public {
+        // arrange
+        p.close();
+        skip(7 days);
+        uint256 tokenId = 1;
+        bayc.transferFrom(address(this), address(p), tokenId);
+
+        // act
+        vm.expectEmit(true, true, true, true);
+        emit Withdraw(tokenId);
+        p.withdraw(tokenId);
     }
 }

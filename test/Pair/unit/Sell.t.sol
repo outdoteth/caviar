@@ -8,6 +8,8 @@ import "../../shared/Fixture.t.sol";
 import "../../../src/Caviar.sol";
 
 contract SellTest is Fixture {
+    event Sell(uint256 inputAmount, uint256 outputAmount);
+
     uint256 public inputAmount = 0.337e18;
     uint256 public minOutputAmount;
 
@@ -101,5 +103,12 @@ contract SellTest is Fixture {
         // assert
         assertEq(balanceBefore - address(ethPair).balance, minOutputAmount, "Should have transferred ether from pair");
         assertEq(address(this).balance - thisBalanceBefore, minOutputAmount, "Should have transferred ether to sender");
+    }
+
+    function testItEmitsSellEvent() public {
+        // act
+        vm.expectEmit(true, true, true, true);
+        emit Sell(inputAmount, minOutputAmount);
+        p.sell(inputAmount, minOutputAmount);
     }
 }
