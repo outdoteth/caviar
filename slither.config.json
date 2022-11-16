@@ -1,5 +1,5 @@
 {
-  "filter_paths": "lib",
+  "filter_paths": "lib|test",
   "solc_remaps": [
     "ERC721A/=lib/ERC721A/contracts/",
     "ds-test/=lib/forge-std/lib/ds-test/src/",

@@ -18,6 +18,7 @@ import "./Caviar.sol";
 /// @notice A pair of an NFT and a base token that can be used to create and trade fractionalized NFTs.
 contract Pair is ERC20, ERC721TokenReceiver {
     using SafeTransferLib for address;
+    using SafeTransferLib for ERC20;
 
     uint256 public constant ONE = 1e18;
     uint256 public constant CLOSE_GRACE_PERIOD = 7 days;
@@ -94,7 +95,7 @@ contract Pair is ERC20, ERC721TokenReceiver {
         // transfer base tokens in if the base token is not ETH
         if (baseToken != address(0)) {
             // transfer base tokens in
-            ERC20(baseToken).transferFrom(msg.sender, address(this), baseTokenAmount);
+            ERC20(baseToken).safeTransferFrom(msg.sender, address(this), baseTokenAmount);
         }
 
         emit Add(baseTokenAmount, fractionalTokenAmount, lpTokenAmount);
@@ -136,7 +137,7 @@ contract Pair is ERC20, ERC721TokenReceiver {
             msg.sender.safeTransferETH(baseTokenOutputAmount);
         } else {
             // transfer base tokens to sender
-            ERC20(baseToken).transfer(msg.sender, baseTokenOutputAmount);
+            ERC20(baseToken).safeTransfer(msg.sender, baseTokenOutputAmount);
         }
 
         emit Remove(baseTokenOutputAmount, fractionalTokenOutputAmount, lpTokenAmount);
@@ -171,7 +172,7 @@ contract Pair is ERC20, ERC721TokenReceiver {
             if (refundAmount > 0) msg.sender.safeTransferETH(maxInputAmount - inputAmount);
         } else {
             // transfer base tokens in
-            ERC20(baseToken).transferFrom(msg.sender, address(this), inputAmount);
+            ERC20(baseToken).safeTransferFrom(msg.sender, address(this), inputAmount);
         }
 
         emit Buy(inputAmount, outputAmount);
@@ -202,7 +203,7 @@ contract Pair is ERC20, ERC721TokenReceiver {
             msg.sender.safeTransferETH(outputAmount);
         } else {
             // transfer base tokens out
-            ERC20(baseToken).transfer(msg.sender, outputAmount);
+            ERC20(baseToken).safeTransfer(msg.sender, outputAmount);
         }
 
         emit Sell(inputAmount, outputAmount);
