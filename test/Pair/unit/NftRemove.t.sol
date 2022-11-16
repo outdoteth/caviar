@@ -39,7 +39,7 @@ contract NftRemoveTest is Fixture {
 
         // act
         (uint256 baseTokenAmount, uint256 fractionalTokenAmount) =
-            p.nftRemove(lpTokenAmount, expectedBaseTokenAmount, tokenIds, proofs);
+            p.nftRemove(lpTokenAmount, expectedBaseTokenAmount, tokenIds);
 
         // assert
         assertEq(baseTokenAmount, expectedBaseTokenAmount, "Should have returned correct base token amount");
@@ -56,7 +56,7 @@ contract NftRemoveTest is Fixture {
         uint256 totalSupplyBefore = lpToken.totalSupply();
 
         // act
-        p.nftRemove(lpTokenAmount, minBaseTokenOutputAmount, tokenIds, proofs);
+        p.nftRemove(lpTokenAmount, minBaseTokenOutputAmount, tokenIds);
 
         // assert
         assertEq(
@@ -73,7 +73,7 @@ contract NftRemoveTest is Fixture {
         uint256 balanceBefore = usd.balanceOf(address(p));
 
         // act
-        p.nftRemove(lpTokenAmount, minBaseTokenOutputAmount, tokenIds, proofs);
+        p.nftRemove(lpTokenAmount, minBaseTokenOutputAmount, tokenIds);
 
         // assert
         assertEq(
@@ -95,7 +95,7 @@ contract NftRemoveTest is Fixture {
         uint256 minBaseTokenOutputAmount = (totalBaseTokenAmount * tokenIds.length * 1e18) / p.fractionalTokenReserves();
 
         // act
-        p.nftRemove(lpTokenAmount, minBaseTokenOutputAmount, tokenIds, proofs);
+        p.nftRemove(lpTokenAmount, minBaseTokenOutputAmount, tokenIds);
 
         // assert
         for (uint256 i = 0; i < tokenIds.length; i++) {
@@ -111,7 +111,7 @@ contract NftRemoveTest is Fixture {
 
         // act
         vm.expectRevert("Slippage: fractional token amount out");
-        p.nftRemove(lpTokenAmount, minBaseTokenOutputAmount, tokenIds, proofs);
+        p.nftRemove(lpTokenAmount, minBaseTokenOutputAmount, tokenIds);
     }
 
     function testItRevertsBaseTokenSlippage() public {
@@ -122,41 +122,6 @@ contract NftRemoveTest is Fixture {
 
         // act
         vm.expectRevert("Slippage: base token amount out");
-        p.nftRemove(lpTokenAmount, minBaseTokenOutputAmount, tokenIds, proofs);
-    }
-
-    function testItRemovesWithMerkleProof() public {
-        // arrange
-        deal(address(usd), address(this), totalBaseTokenAmount, true);
-        delete tokenIds;
-        for (uint256 i = 0; i < 6; i++) {
-            bayc.mint(address(this), i + 6);
-            tokenIds.push(i + 6);
-        }
-
-        Pair pair = createPairScript.create(address(bayc), address(usd), "YEET-mids.json", address(c));
-        proofs = createPairScript.generateMerkleProofs("YEET-mids.json", tokenIds);
-
-        bayc.setApprovalForAll(address(pair), true);
-        usd.approve(address(pair), type(uint256).max);
-
-        uint256 minLpTokenAmount = Math.sqrt(totalBaseTokenAmount * tokenIds.length * 1e18);
-        totalLpTokenAmount = pair.nftAdd(totalBaseTokenAmount, tokenIds, minLpTokenAmount, proofs);
-
-        tokenIds.pop();
-        tokenIds.pop();
-        tokenIds.pop();
-
-        uint256 lpTokenAmount = (totalLpTokenAmount * tokenIds.length * 1e18) / p.fractionalTokenReserves();
-        uint256 minBaseTokenOutputAmount = (totalBaseTokenAmount * tokenIds.length * 1e18) / p.fractionalTokenReserves();
-        proofs = createPairScript.generateMerkleProofs("YEET-mids.json", tokenIds);
-
-        // act
-        pair.nftRemove(lpTokenAmount, minBaseTokenOutputAmount, tokenIds, proofs);
-
-        // assert
-        for (uint256 i = 0; i < tokenIds.length; i++) {
-            assertEq(bayc.ownerOf(tokenIds[i]), address(this), "Should have sent bayc to sender");
-        }
+        p.nftRemove(lpTokenAmount, minBaseTokenOutputAmount, tokenIds);
     }
 }

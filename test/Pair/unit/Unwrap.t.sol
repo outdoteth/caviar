@@ -11,6 +11,7 @@ contract UnwrapTest is Fixture {
     event Unwrap(uint256[] tokenIds);
 
     uint256[] public tokenIds;
+    bytes32[][] public proofs;
 
     function setUp() public {
         bayc.setApprovalForAll(address(p), true);
@@ -20,7 +21,7 @@ contract UnwrapTest is Fixture {
             tokenIds.push(i);
         }
 
-        p.wrap(tokenIds);
+        p.wrap(tokenIds, proofs);
     }
 
     function testItTransfersTokens() public {

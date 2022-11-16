@@ -11,6 +11,7 @@ contract WrapTest is Fixture {
     event Wrap(uint256[] tokenIds);
 
     uint256[] public tokenIds;
+    bytes32[][] public proofs;
 
     function setUp() public {
         bayc.setApprovalForAll(address(p), true);
@@ -23,7 +24,7 @@ contract WrapTest is Fixture {
 
     function testItTransfersTokens() public {
         // act
-        p.wrap(tokenIds);
+        p.wrap(tokenIds, proofs);
 
         // assert
         for (uint256 i = 0; i < tokenIds.length; i++) {
@@ -36,7 +37,7 @@ contract WrapTest is Fixture {
         uint256 expectedFractionalTokens = tokenIds.length * 1e18;
 
         // act
-        p.wrap(tokenIds);
+        p.wrap(tokenIds, proofs);
 
         // assert
         assertEq(p.balanceOf(address(this)), expectedFractionalTokens, "Should have minted fractional tokens to sender");
@@ -47,6 +48,21 @@ contract WrapTest is Fixture {
         // act
         vm.expectEmit(true, true, true, true);
         emit Wrap(tokenIds);
-        p.wrap(tokenIds);
+        p.wrap(tokenIds, proofs);
+    }
+
+    function testItAddsWithMerkleProof() public {
+        // arrange
+        Pair pair = createPairScript.create(address(bayc), address(usd), "YEET-mids.json", address(c));
+        proofs = createPairScript.generateMerkleProofs("YEET-mids.json", tokenIds);
+        bayc.setApprovalForAll(address(pair), true);
+
+        // act
+        pair.wrap(tokenIds, proofs);
+
+        // assert
+        for (uint256 i = 0; i < tokenIds.length; i++) {
+            assertEq(bayc.ownerOf(i), address(pair), "Should have sent bayc to pair");
+        }
     }
 }
