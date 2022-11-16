@@ -399,9 +399,6 @@ contract Pair is ERC20, ERC721TokenReceiver {
     function addQuote(uint256 baseTokenAmount, uint256 fractionalTokenAmount) public view returns (uint256) {
         uint256 lpTokenSupply = lpToken.totalSupply();
         if (lpTokenSupply > 0) {
-            console.log("baseTokenReserves", baseTokenReserves());
-            console.log("fractionalTokenReserves", fractionalTokenReserves());
-
             // calculate amount of lp tokens as a fraction of existing reserves
             uint256 baseTokenShare = (baseTokenAmount * lpTokenSupply) / baseTokenReserves();
             uint256 fractionalTokenShare = (fractionalTokenAmount * lpTokenSupply) / fractionalTokenReserves();
