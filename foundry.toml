@@ -13,3 +13,7 @@ line_length = 120
 
 [fuzz]
 runs = 256
+
+[profile.ci]
+ffi = false
+no_match_test = "MerkleProof"
