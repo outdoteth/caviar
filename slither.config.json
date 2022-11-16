@@ -1,0 +1,11 @@
+{
+  "filter_paths": "lib",
+  "solc_remaps": [
+    "ERC721A/=lib/ERC721A/contracts/",
+    "ds-test/=lib/forge-std/lib/ds-test/src/",
+    "forge-std/=lib/forge-std/src/",
+    "openzeppelin-contracts/=lib/openzeppelin-contracts/contracts/",
+    "openzeppelin/=lib/openzeppelin-contracts/contracts/",
+    "solmate/=lib/solmate/src/"
+  ]
+}
