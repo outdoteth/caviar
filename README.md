@@ -15,5 +15,3 @@ forge test --gas-report
 - [Specification](./docs/SPECIFICATION.md)
 
 - [Testing](./docs/TESTING.md)
-
-- [Security considerations](./docs/SECURITY.md)
