@@ -1,5 +1,11 @@
 TN:
 SF:script/CreateFakeBoredApeYachtClub.s.sol
+FN:11,FakeBoredApeYachtClub.mint
+FNDA:0,FakeBoredApeYachtClub.mint
+DA:12,0
+FN:15,FakeBoredApeYachtClub.tokenURI
+FNDA:0,FakeBoredApeYachtClub.tokenURI
+DA:16,0
 FN:21,CreateFakeBoredApeYachtClubScript.setUp
 FNDA:0,CreateFakeBoredApeYachtClubScript.setUp
 FN:23,CreateFakeBoredApeYachtClubScript.run
@@ -13,12 +19,6 @@ DA:31,0
 DA:32,0
 DA:33,0
 DA:34,0
-FN:11,FakeBoredApeYachtClub.mint
-FNDA:0,FakeBoredApeYachtClub.mint
-DA:12,0
-FN:15,FakeBoredApeYachtClub.tokenURI
-FNDA:0,FakeBoredApeYachtClub.tokenURI
-DA:16,0
 FNF:4
 FNH:0
 LF:11
