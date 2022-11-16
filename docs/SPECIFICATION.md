@@ -1,5 +1,10 @@
 # Specification
 
+Caviar is an NFT AMM that uses the xy=k invariant for the swap curve.
+Users can create shared liquidity pools (pairs) with constraints on which particular NFTs can be traded in those pairs. It makes sense to create pairs with groups of NFTs that are valued similarly by the market. For example, a pair to trade floor NFTs or a pair to trade rare NFTs.
+In addition to this, each pair also contains a fractional ERC20 representation of the NFTs contained within it.
+Users can wrap in and out of this fractional ERC20 token using valid NFTs in the pair.
+
 # Factory (Caviar.sol)
 
 The factory contract is responsible for creating new pairs.
@@ -89,7 +94,7 @@ The solution which we use works like the following:
 
 - Admin decides whether the claim is legitmate or not.
 
-- Admin "closes" the pair, preventing future wraps (all other actions are still valid). A 1 week grace period starts.
+- Admin "closes" the pair, preventing future wraps (all other actions are still valid). The pair is also removed from the factory mapping (via `destroy()`). A 1 week grace period starts.
 
 - After 1 week, the admin withdraws the NFTs in the contract and puts them up for auction. The proceeds from the auction are distributed pro rata to fractional token holders who can burn their tokens in exchange.
 
