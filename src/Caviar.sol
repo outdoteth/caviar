@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import "solmate/tokens/ERC20.sol";
 import "solmate/auth/Owned.sol";
 
-import "./Pair.sol";
 import "./lib/SafeERC20Namer.sol";
+import "./Pair.sol";
 
 /// @title caviar.sh
 /// @author out.eth (@outdoteth)
