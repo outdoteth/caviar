@@ -110,6 +110,19 @@
       {
         "indexed": false,
         "internalType": "uint256",
+        "name": "closeTimestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "Close",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "baseTokenAmount",
         "type": "uint256"
       },
@@ -191,6 +204,19 @@
     "inputs": [
       {
         "indexed": false,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "Withdraw",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
         "internalType": "uint256[]",
         "name": "tokenIds",
         "type": "uint256[]"
@@ -198,6 +224,19 @@
     ],
     "name": "Wrap",
     "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "CLOSE_GRACE_PERIOD",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
     "inputs": [],
@@ -247,11 +286,35 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "lpTokenAmount",
         "type": "uint256"
       }
     ],
     "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "baseTokenAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "fractionalTokenAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "addQuote",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -364,7 +427,7 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "inputAmount",
         "type": "uint256"
       }
     ],
@@ -380,6 +443,39 @@
       }
     ],
     "name": "buyQuote",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "caviar",
+    "outputs": [
+      {
+        "internalType": "contract Caviar",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "close",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "closeTimestamp",
     "outputs": [
       {
         "internalType": "uint256",
@@ -421,7 +517,7 @@
     "name": "lpToken",
     "outputs": [
       {
-        "internalType": "address",
+        "internalType": "contract LpToken",
         "name": "",
         "type": "address"
       }
@@ -495,7 +591,7 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "lpTokenAmount",
         "type": "uint256"
       }
     ],
@@ -513,18 +609,13 @@
         "internalType": "uint256",
         "name": "maxInputAmount",
         "type": "uint256"
-      },
-      {
-        "internalType": "bytes32[][]",
-        "name": "proofs",
-        "type": "bytes32[][]"
       }
     ],
     "name": "nftBuy",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "inputAmount",
         "type": "uint256"
       }
     ],
@@ -547,23 +638,18 @@
         "internalType": "uint256[]",
         "name": "tokenIds",
         "type": "uint256[]"
-      },
-      {
-        "internalType": "bytes32[][]",
-        "name": "proofs",
-        "type": "bytes32[][]"
       }
     ],
     "name": "nftRemove",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "baseTokenOutputAmount",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "fractionalTokenOutputAmount",
         "type": "uint256"
       }
     ],
@@ -592,7 +678,7 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "outputAmount",
         "type": "uint256"
       }
     ],
@@ -730,6 +816,30 @@
     "outputs": [
       {
         "internalType": "uint256",
+        "name": "baseTokenOutputAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "fractionalTokenOutputAmount",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "lpTokenAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "removeQuote",
+    "outputs": [
+      {
+        "internalType": "uint256",
         "name": "",
         "type": "uint256"
       },
@@ -739,7 +849,7 @@
         "type": "uint256"
       }
     ],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -759,7 +869,7 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "outputAmount",
         "type": "uint256"
       }
     ],
@@ -876,7 +986,7 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "fractionalTokenAmount",
         "type": "uint256"
       }
     ],
@@ -886,16 +996,34 @@
   {
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "withdraw",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint256[]",
         "name": "tokenIds",
         "type": "uint256[]"
+      },
+      {
+        "internalType": "bytes32[][]",
+        "name": "proofs",
+        "type": "bytes32[][]"
       }
     ],
     "name": "wrap",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "fractionalTokenAmount",
         "type": "uint256"
       }
     ],
