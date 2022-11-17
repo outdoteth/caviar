@@ -1,6 +1,6 @@
 # Caviar
 
-Caviar is a fully on-chain NFT AMM that allows you to trade every NFT in a collection (from floors to superrares). You can also trade fractional amounts of each NFT too.
+[Caviar](https://goerli.caviar.sh) is a fully on-chain NFT AMM that allows you to trade every NFT in a collection (from floors to superrares). You can also trade fractional amounts of each NFT too.
 It's designed with a heavy emphasis on composability, flexibility and usability.
 
 ## Index
@@ -8,6 +8,8 @@ It's designed with a heavy emphasis on composability, flexibility and usability.
 - [Specification](./docs/SPECIFICATION.md)
 
 - [Testing](./docs/TESTING.md)
+
+- [Security considerations](./docs/SECURITY.md)
 
 ## Getting started
 
@@ -18,7 +20,7 @@ forge test --gas-report
 
 ## Deployments
 
-Goerli
+**Goerli: ([app](https://goerli.caviar.sh))**
 
 | Contract             | Address                                                                                                                      |
 | -------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
