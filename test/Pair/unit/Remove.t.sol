@@ -119,7 +119,7 @@ contract RemoveTest is Fixture {
         uint256 minFractionalTokenOutputAmount = totalFractionalTokenAmount / 2 + 1; // add 1 to cause revert
 
         // act
-        vm.expectRevert("Slippage: fractional token amount out");
+        vm.expectRevert("Slippage: fractional token out");
         p.remove(lpTokenAmount, minBaseTokenOutputAmount, minFractionalTokenOutputAmount);
     }
 

@@ -110,7 +110,7 @@ contract NftRemoveTest is Fixture {
         tokenIds.push(100); // add a token to cause revert
 
         // act
-        vm.expectRevert("Slippage: fractional token amount out");
+        vm.expectRevert("Slippage: fractional token out");
         p.nftRemove(lpTokenAmount, minBaseTokenOutputAmount, tokenIds);
     }
 
