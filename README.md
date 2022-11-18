@@ -22,9 +22,9 @@ forge test --gas-report
 
 **Goerli: ([app](https://goerli.caviar.sh))**
 
-| Contract             | Address                                                                                                                      |
-| -------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| Caviar               | [0x4442fD4a38c6FBe364AdC6FF2CFA9332F0E7D378](https://goerli.etherscan.io/address/0x4442fD4a38c6FBe364AdC6FF2CFA9332F0E7D378) |
-| FBAYC                | [0xC1A308D95344716054d4C078831376FC78c4fd72](https://goerli.etherscan.io/address/0xC1A308D95344716054d4C078831376FC78c4fd72) |
-| Pair (FBAYC:ETH)     | [0x7033A7A1980e019BA6A2016a14b3CD783e35300a](https://goerli.etherscan.io/address/0x7033A7A1980e019BA6A2016a14b3CD783e35300a) |
-| LP Token (FBAYC:ETH) | [0x96E6B35Cc73070FCDB42Abe5a39BfD7f16c37cFc](https://goerli.etherscan.io/address/0x96E6B35Cc73070FCDB42Abe5a39BfD7f16c37cFc) |
+| Contract              | Address                                                                                                                      |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Caviar                | [0x4442fD4a38c6FBe364AdC6FF2CFA9332F0E7D378](https://goerli.etherscan.io/address/0x4442fD4a38c6FBe364AdC6FF2CFA9332F0E7D378) |
+| FBAYC                 | [0xC1A308D95344716054d4C078831376FC78c4fd72](https://goerli.etherscan.io/address/0xC1A308D95344716054d4C078831376FC78c4fd72) |
+| Pair (Rare FBAYC:ETH) | [0x7033A7A1980e019BA6A2016a14b3CD783e35300a](https://goerli.etherscan.io/address/0x7033A7A1980e019BA6A2016a14b3CD783e35300a) |
+| LP Token (FBAYC:ETH)  | [0x96E6B35Cc73070FCDB42Abe5a39BfD7f16c37cFc](https://goerli.etherscan.io/address/0x96E6B35Cc73070FCDB42Abe5a39BfD7f16c37cFc) |
