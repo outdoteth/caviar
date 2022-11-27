@@ -36,61 +36,14 @@
       ]
     }
   ],
-  "receipts": [
-    {
-      "transactionHash": "0x80f3c84bf25111f139d808d882c277806bc8713b03a29702ccb9ed64e3be82b2",
-      "transactionIndex": "0x1",
-      "blockHash": "0xf53516c4e4c65970b2708500af3efab6c3c3aea8406bc30e3cb54443ed344080",
-      "blockNumber": "0x7a724a",
-      "from": "0xAc314DfCe6a883195F6516A34F978C8C2726AF48",
-      "to": "0x4442fD4a38c6FBe364AdC6FF2CFA9332F0E7D378",
-      "cumulativeGasUsed": "0x34e267",
-      "gasUsed": "0x34905f",
-      "contractAddress": null,
-      "logs": [
-        {
-          "address": "0x05a2Cdd0991C0C07ce7b8f9Ec40267c65e0450b6",
-          "topics": [
-            "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0",
-            "0x0000000000000000000000000000000000000000000000000000000000000000",
-            "0x000000000000000000000000051e2b6228cd6f2f2645d2e238ceb108099821c1"
-          ],
-          "data": "0x",
-          "blockHash": "0xf53516c4e4c65970b2708500af3efab6c3c3aea8406bc30e3cb54443ed344080",
-          "blockNumber": "0x7a724a",
-          "transactionHash": "0x80f3c84bf25111f139d808d882c277806bc8713b03a29702ccb9ed64e3be82b2",
-          "transactionIndex": "0x1",
-          "logIndex": "0x0",
-          "removed": false
-        },
-        {
-          "address": "0x4442fD4a38c6FBe364AdC6FF2CFA9332F0E7D378",
-          "topics": [
-            "0x94e35d08a6788cb2901c35019eb1105f35dcfdac00943412ebe0236470ee420f",
-            "0x0000000000000000000000000c55c9c970df3cafd3774daeb0abf947de9df3d1",
-            "0x0000000000000000000000000000000000000000000000000000000000000000",
-            "0x25a054bc9aa411912e2f0d94fea22806413b62df782337fad14481aae4e5b2dc"
-          ],
-          "data": "0x",
-          "blockHash": "0xf53516c4e4c65970b2708500af3efab6c3c3aea8406bc30e3cb54443ed344080",
-          "blockNumber": "0x7a724a",
-          "transactionHash": "0x80f3c84bf25111f139d808d882c277806bc8713b03a29702ccb9ed64e3be82b2",
-          "transactionIndex": "0x1",
-          "logIndex": "0x1",
-          "removed": false
-        }
-      ],
-      "status": "0x1",
-      "logsBloom": "0x00000000008000000000000000000000000000000000000000800000000002000000000002010000000000000000000000000000000000000000020000000000000000000000000000000080000000000001000000000000000000000000000000000000820000800000000000000800000000004000000000000000000000400000000000400000000000000200000000000000000000000001000000000000000000000000000000002010040000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000080000020000000000000000000000000000000000000000000000000020000000001000000",
-      "type": "0x2",
-      "effectiveGasPrice": "0xb2d05e29"
-    }
-  ],
+  "receipts": [],
   "libraries": [],
-  "pending": [],
+  "pending": [
+    "0x80f3c84bf25111f139d808d882c277806bc8713b03a29702ccb9ed64e3be82b2"
+  ],
   "path": "/Users/out/caviar/broadcast/CreatePair.s.sol/5/run-latest.json",
   "returns": {},
-  "timestamp": 1669478129,
+  "timestamp": 1669478074,
   "chain": 5,
   "multi": false,
   "commit": "c4183ab"
