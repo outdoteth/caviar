@@ -297,7 +297,7 @@ contract Pair is ERC20, ERC721TokenReceiver {
     {
         // remove liquidity and send fractional tokens and base tokens to sender
         (baseTokenOutputAmount, fractionalTokenOutputAmount) =
-            remove(lpTokenAmount, minBaseTokenOutputAmount, tokenIds.length * 1e18);
+            remove(lpTokenAmount, minBaseTokenOutputAmount, tokenIds.length * ONE);
 
         // unwrap the fractional tokens into NFTs and send to sender
         unwrap(tokenIds);
@@ -309,7 +309,7 @@ contract Pair is ERC20, ERC721TokenReceiver {
     /// @return inputAmount The amount of base tokens spent.
     function nftBuy(uint256[] calldata tokenIds, uint256 maxInputAmount) public payable returns (uint256 inputAmount) {
         // buy fractional tokens using base tokens
-        inputAmount = buy(tokenIds.length * 1e18, maxInputAmount);
+        inputAmount = buy(tokenIds.length * ONE, maxInputAmount);
 
         // unwrap the fractional tokens into NFTs and send to sender
         unwrap(tokenIds);
