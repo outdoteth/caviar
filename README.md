@@ -20,7 +20,7 @@ forge test --gas-report
 
 ## Deployments
 
-**Goerli: ([app](https://goerli.caviar.sh))**
+**Goerli: ([demo app](https://goerli.caviar.sh))**
 
 | Contract              | Address                                                                                                                      |
 | --------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
