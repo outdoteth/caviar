@@ -19,7 +19,7 @@ contract CreatePairScript is Script {
         address caviar = vm.envAddress("CAVIAR_ADDRESS");
         address nft = vm.envAddress("NFT_ADDRESS");
 
-        create(nft, address(0), "doodles-mids.json", caviar);
+        create(nft, address(0), "invisible-friends-mids.json", caviar);
     }
 
     function create(address nft, address baseToken, string memory rankingFile, address caviar) public returns (Pair) {
