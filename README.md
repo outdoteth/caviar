@@ -14,6 +14,7 @@ It's designed with a heavy emphasis on composability, flexibility and usability.
 ## Getting started
 
 ```
+yarn
 forge install
 forge test --gas-report
 ```
