@@ -18,6 +18,15 @@ forge install
 forge test --gas-report
 ```
 
+## Contracts overview
+
+| Contract           | LOC | Description                                                           |
+| ------------------ | --- | --------------------------------------------------------------------- |
+| Caviar.sol         | 26  | Factory contract that creates pairs and maintains a registry          |
+| Pair.sol           | 212 | Pair contract that contains ERC20 AMM, NFT wrapping and NFT AMM logic |
+| LpToken.sol        | 15  | ERC20 token which represents liquidity ownership in pair contracts    |
+| SafeERC20Namer.sol | 65  | Helper contract that fetches the name and symbol of an ERC20/ERC721   |
+
 ## Deployments
 
 **Goerli: ([demo app](https://goerli.caviar.sh))**
