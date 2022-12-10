@@ -244,15 +244,26 @@ contract Pair is ERC20, ERC721TokenReceiver {
 
     /// @notice Unwraps fractional tokens into NFTs.
     /// @param tokenIds The ids of the NFTs to unwrap.
+    /// @param withFee Whether to pay a fee for unwrapping or not.
     /// @return fractionalTokenAmount The amount of fractional tokens burned.
-    function unwrap(uint256[] calldata tokenIds) public returns (uint256 fractionalTokenAmount) {
+    function unwrap(uint256[] calldata tokenIds, bool withFee) public returns (uint256 fractionalTokenAmount) {
         // *** Effects *** //
 
         // burn fractional tokens from sender
         fractionalTokenAmount = tokenIds.length * ONE;
         _burn(msg.sender, fractionalTokenAmount);
 
-        // *** Interactions *** //
+        // Take the fee if withFee is true
+        if (withFee) {
+            // calculate fee
+            uint256 fee = fractionalTokenAmount * 3 / 1000;
+
+            // transfer fee from sender
+            _transferFrom(msg.sender, address(this), fee);
+
+            // burn fractional tokens from sender
+            fractionalTokenAmount += fee;
+        }
 
         // transfer nfts to sender
         for (uint256 i = 0; i < tokenIds.length; i++) {
@@ -289,18 +300,21 @@ contract Pair is ERC20, ERC721TokenReceiver {
     /// @param lpTokenAmount The amount of lp tokens to remove.
     /// @param minBaseTokenOutputAmount The minimum amount of base tokens to receive.
     /// @param tokenIds The ids of the NFTs to remove.
+    /// @param withFee Whether to pay a fee for unwrapping or not.
     /// @return baseTokenOutputAmount The amount of base tokens received.
     /// @return fractionalTokenOutputAmount The amount of fractional tokens received.
-    function nftRemove(uint256 lpTokenAmount, uint256 minBaseTokenOutputAmount, uint256[] calldata tokenIds)
-        public
-        returns (uint256 baseTokenOutputAmount, uint256 fractionalTokenOutputAmount)
-    {
+    function nftRemove(
+        uint256 lpTokenAmount,
+        uint256 minBaseTokenOutputAmount,
+        uint256[] calldata tokenIds,
+        bool withFee
+    ) public returns (uint256 baseTokenOutputAmount, uint256 fractionalTokenOutputAmount) {
         // remove liquidity and send fractional tokens and base tokens to sender
         (baseTokenOutputAmount, fractionalTokenOutputAmount) =
             remove(lpTokenAmount, minBaseTokenOutputAmount, tokenIds.length * ONE);
 
         // unwrap the fractional tokens into NFTs and send to sender
-        unwrap(tokenIds);
+        unwrap(tokenIds, withFee);
     }
 
     /// @notice Buys NFTs from the pair using base tokens.
@@ -312,7 +326,7 @@ contract Pair is ERC20, ERC721TokenReceiver {
         inputAmount = buy(tokenIds.length * ONE, maxInputAmount);
 
         // unwrap the fractional tokens into NFTs and send to sender
-        unwrap(tokenIds);
+        unwrap(tokenIds, false);
     }
 
     /// @notice Sells NFTs to the pair for base tokens.

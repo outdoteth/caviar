@@ -26,7 +26,7 @@ contract UnwrapTest is Fixture {
 
     function testItTransfersTokens() public {
         // act
-        p.unwrap(tokenIds);
+        p.unwrap(tokenIds, false);
 
         // assert
         for (uint256 i = 0; i < tokenIds.length; i++) {
@@ -41,7 +41,7 @@ contract UnwrapTest is Fixture {
         uint256 totalSupplyBefore = p.totalSupply();
 
         // act
-        p.unwrap(tokenIds);
+        p.unwrap(tokenIds, false);
 
         // assert
         assertEq(
@@ -55,10 +55,36 @@ contract UnwrapTest is Fixture {
         );
     }
 
+    function testItUnwrapsWithFee() public {
+        // arrange
+        tokenIds.pop();
+        uint256 expectedFractionalTokensBurned = tokenIds.length * 1e18;
+        uint256 pairBalanceBefore = p.balanceOf(address(p));
+        uint256 balanceBefore = p.balanceOf(address(this));
+        uint256 totalSupplyBefore = p.totalSupply();
+        uint256 fee = (expectedFractionalTokensBurned * 3) / 1000;
+
+        // act
+        p.unwrap(tokenIds, true);
+
+        // assert
+        assertEq(
+            balanceBefore - p.balanceOf(address(this)),
+            expectedFractionalTokensBurned + fee,
+            "Should have burned fractional tokens from sender"
+        );
+
+        assertEq(p.balanceOf(address(p)) - pairBalanceBefore, fee, "Should have transferred fee to pair");
+
+        assertEq(
+            totalSupplyBefore - p.totalSupply(), expectedFractionalTokensBurned, "Should have burned fractional tokens"
+        );
+    }
+
     function testItEmitsUnwrapEvent() public {
         // act
         vm.expectEmit(true, true, true, true);
         emit Unwrap(tokenIds);
-        p.unwrap(tokenIds);
+        p.unwrap(tokenIds, false);
     }
 }

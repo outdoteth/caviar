@@ -39,7 +39,7 @@ contract NftRemoveTest is Fixture {
 
         // act
         (uint256 baseTokenAmount, uint256 fractionalTokenAmount) =
-            p.nftRemove(lpTokenAmount, expectedBaseTokenAmount, tokenIds);
+            p.nftRemove(lpTokenAmount, expectedBaseTokenAmount, tokenIds, false);
 
         // assert
         assertEq(baseTokenAmount, expectedBaseTokenAmount, "Should have returned correct base token amount");
@@ -56,7 +56,7 @@ contract NftRemoveTest is Fixture {
         uint256 totalSupplyBefore = lpToken.totalSupply();
 
         // act
-        p.nftRemove(lpTokenAmount, minBaseTokenOutputAmount, tokenIds);
+        p.nftRemove(lpTokenAmount, minBaseTokenOutputAmount, tokenIds, false);
 
         // assert
         assertEq(
@@ -73,7 +73,7 @@ contract NftRemoveTest is Fixture {
         uint256 balanceBefore = usd.balanceOf(address(p));
 
         // act
-        p.nftRemove(lpTokenAmount, minBaseTokenOutputAmount, tokenIds);
+        p.nftRemove(lpTokenAmount, minBaseTokenOutputAmount, tokenIds, false);
 
         // assert
         assertEq(
@@ -95,7 +95,7 @@ contract NftRemoveTest is Fixture {
         uint256 minBaseTokenOutputAmount = (totalBaseTokenAmount * tokenIds.length * 1e18) / p.fractionalTokenReserves();
 
         // act
-        p.nftRemove(lpTokenAmount, minBaseTokenOutputAmount, tokenIds);
+        p.nftRemove(lpTokenAmount, minBaseTokenOutputAmount, tokenIds, false);
 
         // assert
         for (uint256 i = 0; i < tokenIds.length; i++) {
@@ -111,7 +111,7 @@ contract NftRemoveTest is Fixture {
 
         // act
         vm.expectRevert("Slippage: fractional token out");
-        p.nftRemove(lpTokenAmount, minBaseTokenOutputAmount, tokenIds);
+        p.nftRemove(lpTokenAmount, minBaseTokenOutputAmount, tokenIds, false);
     }
 
     function testItRevertsBaseTokenSlippage() public {
@@ -122,6 +122,6 @@ contract NftRemoveTest is Fixture {
 
         // act
         vm.expectRevert("Slippage: base token amount out");
-        p.nftRemove(lpTokenAmount, minBaseTokenOutputAmount, tokenIds);
+        p.nftRemove(lpTokenAmount, minBaseTokenOutputAmount, tokenIds, false);
     }
 }
