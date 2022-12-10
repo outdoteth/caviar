@@ -260,8 +260,6 @@ contract Pair is ERC20, ERC721TokenReceiver {
 
             // transfer fee from sender
             _transferFrom(msg.sender, address(this), fee);
-
-            // burn fractional tokens from sender
             fractionalTokenAmount += fee;
         }
 
