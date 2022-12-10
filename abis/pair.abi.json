@@ -638,6 +638,11 @@
         "internalType": "uint256[]",
         "name": "tokenIds",
         "type": "uint256[]"
+      },
+      {
+        "internalType": "bool",
+        "name": "withFee",
+        "type": "bool"
       }
     ],
     "name": "nftRemove",
@@ -980,6 +985,11 @@
         "internalType": "uint256[]",
         "name": "tokenIds",
         "type": "uint256[]"
+      },
+      {
+        "internalType": "bool",
+        "name": "withFee",
+        "type": "bool"
       }
     ],
     "name": "unwrap",

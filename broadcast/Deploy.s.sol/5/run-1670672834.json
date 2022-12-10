@@ -20,45 +20,14 @@
       "additionalContracts": []
     }
   ],
-  "receipts": [
-    {
-      "transactionHash": "0xe3917bd0791f040ee8c646c852f5271072482c4dde614693dafa46bd1db18cd7",
-      "transactionIndex": "0x5",
-      "blockHash": "0x6f3ec6c7e952efa355ef8f9dfdddf39f51aedb1bc31d99d568d7bd7d5a395b25",
-      "blockNumber": "0x7bbf48",
-      "from": "0xE70989f0A6b50E3c8Ef6Df57e994E99AA79EbD27",
-      "to": null,
-      "cumulativeGasUsed": "0x534687",
-      "gasUsed": "0x4cdc52",
-      "contractAddress": "0x6f33e79E7AC6F73fF18ABa8018060B124821C2E2",
-      "logs": [
-        {
-          "address": "0x6f33e79E7AC6F73fF18ABa8018060B124821C2E2",
-          "topics": [
-            "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0",
-            "0x0000000000000000000000000000000000000000000000000000000000000000",
-            "0x000000000000000000000000e70989f0a6b50e3c8ef6df57e994e99aa79ebd27"
-          ],
-          "data": "0x",
-          "blockHash": "0x6f3ec6c7e952efa355ef8f9dfdddf39f51aedb1bc31d99d568d7bd7d5a395b25",
-          "blockNumber": "0x7bbf48",
-          "transactionHash": "0xe3917bd0791f040ee8c646c852f5271072482c4dde614693dafa46bd1db18cd7",
-          "transactionIndex": "0x5",
-          "logIndex": "0x4",
-          "removed": false
-        }
-      ],
-      "status": "0x1",
-      "logsBloom": "0x00000000000000000000000000000000000000000000000000900000000000000008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000020000000000000000000800000000200000000000000000000000400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000080000000000004000000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000200000000000000000000000000000000000000000",
-      "type": "0x2",
-      "effectiveGasPrice": "0xb2d1a01c"
-    }
-  ],
+  "receipts": [],
   "libraries": [],
-  "pending": [],
+  "pending": [
+    "0xe3917bd0791f040ee8c646c852f5271072482c4dde614693dafa46bd1db18cd7"
+  ],
   "path": "/Users/out/caviar/broadcast/Deploy.s.sol/5/run-latest.json",
   "returns": {},
-  "timestamp": 1670672891,
+  "timestamp": 1670672834,
   "chain": 5,
   "multi": false,
   "commit": "fefa781"
