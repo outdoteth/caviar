@@ -19,6 +19,40 @@ forge install
 forge test --gas-report
 ```
 
+## Example
+
+```
+forge install outdoteth/caviar transmissions11/solmate
+```
+
+```solidity
+pragma solidity ^0.8.17;
+
+import "caviar/Caviar.sol";
+import "caviar/Pair.sol";
+import "solmate/tokens/ERC721.sol";
+
+contract ExampleSwapper {
+    Pair pair;
+    ERC721 nft;
+
+    constructor(address _nft, address _caviar) {
+        nft = ERC721(_nft);
+        pair = Pair(Caviar(_caviar).pairs(_nft, address(0), bytes32(0)));
+    }
+
+    function buy(uint256[] memory tokenIds, uint256 maxInput) public payable {
+        pair.nftBuy(tokenIds, maxInput);
+    }
+
+    function sell(uint256[] memory tokenIds, uint256 minOutput) public {
+        bytes32[][] memory proofs  = new bytes32[][](0);
+        nft.setApprovalForAll(address(pair), true);
+        pair.nftSell(tokenIds, minOutput, proofs);
+    }
+}
+```
+
 ## Contracts overview
 
 | Contract           | LOC | Description                                                           |
