@@ -41,11 +41,11 @@ contract ExampleSwapper {
         pair = Pair(Caviar(_caviar).pairs(_nft, address(0), bytes32(0)));
     }
 
-    function buy(uint256[] memory tokenIds, uint256 maxInput) public payable {
-        pair.nftBuy(tokenIds, maxInput);
-    }
+    function buyAndSell(uint256[] memory tokenIds, uint256 maxInput, uint256 minOutput) public payable {
+        // buy nfts
+        pair.nftBuy{value: maxInput}(tokenIds, maxInput);
 
-    function sell(uint256[] memory tokenIds, uint256 minOutput) public {
+        // sell nfts
         bytes32[][] memory proofs  = new bytes32[][](0);
         nft.setApprovalForAll(address(pair), true);
         pair.nftSell(tokenIds, minOutput, proofs);
