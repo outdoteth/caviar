@@ -28,6 +28,8 @@ contract Caviar is Owned {
     function create(address nft, address baseToken, bytes32 merkleRoot) public returns (Pair pair) {
         // check that the pair doesn't already exist
         require(pairs[nft][baseToken][merkleRoot] == address(0), "Pair already exists");
+        require(nft.code.length > 0, "Invalid NFT contract");
+        require(baseToken.code.length > 0 || baseToken == address(0), "Invalid base token contract");
 
         // deploy the pair
         string memory baseTokenSymbol = baseToken == address(0) ? "ETH" : baseToken.tokenSymbol();
