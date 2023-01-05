@@ -59,12 +59,16 @@ contract Pair is ERC20, ERC721TokenReceiver {
     /// @param baseTokenAmount The amount of base tokens to add.
     /// @param fractionalTokenAmount The amount of fractional tokens to add.
     /// @param minLpTokenAmount The minimum amount of LP tokens to mint.
+    /// @param minPrice The minimum price that the pool should currently be at.
+    /// @param maxPrice The maximum price that the pool should currently be at.
     /// @return lpTokenAmount The amount of LP tokens minted.
-    function add(uint256 baseTokenAmount, uint256 fractionalTokenAmount, uint256 minLpTokenAmount)
-        public
-        payable
-        returns (uint256 lpTokenAmount)
-    {
+    function add(
+        uint256 baseTokenAmount,
+        uint256 fractionalTokenAmount,
+        uint256 minLpTokenAmount,
+        uint256 minPrice,
+        uint256 maxPrice
+    ) public payable returns (uint256 lpTokenAmount) {
         // *** Checks *** //
 
         // check the token amount inputs are not zero
@@ -72,6 +76,12 @@ contract Pair is ERC20, ERC721TokenReceiver {
 
         // check that correct eth input was sent - if the baseToken equals address(0) then native ETH is used
         require(baseToken == address(0) ? msg.value == baseTokenAmount : msg.value == 0, "Invalid ether input");
+
+        // check that the price is within the bounds if there is liquidity in the pool
+        if (lpToken.totalSupply() != 0) {
+            uint256 _price = price();
+            require(_price >= minPrice && _price <= maxPrice, "Slippage: price out of bounds");
+        }
 
         // calculate the lp token shares to mint
         lpTokenAmount = addQuote(baseTokenAmount, fractionalTokenAmount);
@@ -279,19 +289,23 @@ contract Pair is ERC20, ERC721TokenReceiver {
     /// @param baseTokenAmount The amount of base tokens to add.
     /// @param tokenIds The ids of the NFTs to add.
     /// @param minLpTokenAmount The minimum amount of lp tokens to receive.
+    /// @param minPrice The minimum price of the pair.
+    /// @param maxPrice The maximum price of the pair.
     /// @param proofs The merkle proofs for the NFTs.
     /// @return lpTokenAmount The amount of lp tokens minted.
     function nftAdd(
         uint256 baseTokenAmount,
         uint256[] calldata tokenIds,
         uint256 minLpTokenAmount,
+        uint256 minPrice,
+        uint256 maxPrice,
         bytes32[][] calldata proofs
     ) public payable returns (uint256 lpTokenAmount) {
         // wrap the incoming NFTs into fractional tokens
         uint256 fractionalTokenAmount = wrap(tokenIds, proofs);
 
         // add liquidity using the fractional tokens and base tokens
-        lpTokenAmount = add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount);
+        lpTokenAmount = add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, minPrice, maxPrice);
     }
 
     /// @notice Removes liquidity from the pair using NFTs.

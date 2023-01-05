@@ -23,14 +23,16 @@ contract BuyTest is Fixture {
         usd.approve(address(p), type(uint256).max);
 
         uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount);
-        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount);
+        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max);
 
         maxInputAmount =
             (outputAmount * p.baseTokenReserves() * 1000) / ((p.fractionalTokenReserves() - outputAmount) * 997);
         deal(address(usd), address(this), maxInputAmount, true);
 
         deal(address(ethPair), address(this), fractionalTokenAmount, true);
-        ethPair.add{value: baseTokenAmount}(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount);
+        ethPair.add{value: baseTokenAmount}(
+            baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max
+        );
     }
 
     function testItReturnsInputAmount() public {
