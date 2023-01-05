@@ -19,6 +19,7 @@ contract Pair is ERC20, ERC721TokenReceiver {
 
     uint256 public constant ONE = 1e18;
     uint256 public constant CLOSE_GRACE_PERIOD = 7 days;
+    uint256 private constant MINIMUM_LIQUIDITY = 1000;
 
     address public immutable nft;
     address public immutable baseToken; // address(0) for ETH
@@ -77,14 +78,16 @@ contract Pair is ERC20, ERC721TokenReceiver {
         // check that correct eth input was sent - if the baseToken equals address(0) then native ETH is used
         require(baseToken == address(0) ? msg.value == baseTokenAmount : msg.value == 0, "Invalid ether input");
 
+        uint256 lpTokenSupply = lpToken.totalSupply();
+
         // check that the price is within the bounds if there is liquidity in the pool
-        if (lpToken.totalSupply() != 0) {
+        if (lpTokenSupply != 0) {
             uint256 _price = price();
             require(_price >= minPrice && _price <= maxPrice, "Slippage: price out of bounds");
         }
 
         // calculate the lp token shares to mint
-        lpTokenAmount = addQuote(baseTokenAmount, fractionalTokenAmount);
+        lpTokenAmount = addQuote(baseTokenAmount, fractionalTokenAmount, lpTokenSupply);
 
         // check that the amount of lp tokens outputted is greater than the min amount
         require(lpTokenAmount >= minLpTokenAmount, "Slippage: lp token amount out");
@@ -98,6 +101,11 @@ contract Pair is ERC20, ERC721TokenReceiver {
 
         // mint lp tokens to sender
         lpToken.mint(msg.sender, lpTokenAmount);
+
+        // transfer first MINIMUM_LIQUIDITY lp tokens to the owner
+        if (lpTokenSupply == 0) {
+            lpToken.mint(caviar.owner(), MINIMUM_LIQUIDITY);
+        }
 
         // transfer base tokens in if the base token is not ETH
         if (baseToken != address(0)) {
@@ -440,16 +448,19 @@ contract Pair is ERC20, ERC721TokenReceiver {
     /// @param baseTokenAmount The amount of base tokens to add.
     /// @param fractionalTokenAmount The amount of fractional tokens to add.
     /// @return lpTokenAmount The amount of lp tokens received.
-    function addQuote(uint256 baseTokenAmount, uint256 fractionalTokenAmount) public view returns (uint256) {
-        uint256 lpTokenSupply = lpToken.totalSupply();
-        if (lpTokenSupply > 0) {
+    function addQuote(uint256 baseTokenAmount, uint256 fractionalTokenAmount, uint256 lpTokenSupply)
+        public
+        view
+        returns (uint256)
+    {
+        if (lpTokenSupply != 0) {
             // calculate amount of lp tokens as a fraction of existing reserves
             uint256 baseTokenShare = (baseTokenAmount * lpTokenSupply) / baseTokenReserves();
             uint256 fractionalTokenShare = (fractionalTokenAmount * lpTokenSupply) / fractionalTokenReserves();
             return Math.min(baseTokenShare, fractionalTokenShare);
         } else {
             // if there is no liquidity then init
-            return Math.sqrt(baseTokenAmount * fractionalTokenAmount);
+            return Math.sqrt(baseTokenAmount * fractionalTokenAmount) - MINIMUM_LIQUIDITY;
         }
     }
 

@@ -10,23 +10,26 @@ import "../../../src/Caviar.sol";
 contract RemoveTest is Fixture {
     event Remove(uint256 baseTokenAmount, uint256 fractionalTokenAmount, uint256 lpTokenAmount);
 
-    uint256 public totalBaseTokenAmount = 100;
-    uint256 public totalFractionalTokenAmount = 30;
+    uint256 public totalBaseTokenAmount = 10000;
+    uint256 public totalFractionalTokenAmount = 1000;
     uint256 public totalLpTokenAmount;
 
     function setUp() public {
-        deal(address(usd), address(this), totalBaseTokenAmount, true);
-        deal(address(p), address(this), totalFractionalTokenAmount, true);
+        deal(address(usd), address(this), totalBaseTokenAmount * 2, true);
+        deal(address(p), address(this), totalFractionalTokenAmount * 2, true);
 
         usd.approve(address(p), type(uint256).max);
 
-        uint256 minLpTokenAmount = Math.sqrt(totalBaseTokenAmount * totalFractionalTokenAmount);
-        totalLpTokenAmount =
-            p.add(totalBaseTokenAmount, totalFractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max);
+        p.add(totalBaseTokenAmount, totalFractionalTokenAmount, 0, 0, type(uint256).max);
+        totalLpTokenAmount = p.add(totalBaseTokenAmount, totalFractionalTokenAmount, 0, 0, type(uint256).max);
 
-        deal(address(ethPair), address(this), totalFractionalTokenAmount, true);
+        deal(address(ethPair), address(this), totalFractionalTokenAmount * 2, true);
         ethPair.add{value: totalBaseTokenAmount}(
-            totalBaseTokenAmount, totalFractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max
+            totalBaseTokenAmount, totalFractionalTokenAmount, 0, 0, type(uint256).max
+        );
+
+        ethPair.add{value: totalBaseTokenAmount}(
+            totalBaseTokenAmount, totalFractionalTokenAmount, 0, 0, type(uint256).max
         );
     }
 
@@ -177,9 +180,9 @@ contract RemoveTest is Fixture {
     function testItReturnsBaseTokenAmountAndFractionalTokenAmount(uint256 fractionToRemove) public {
         // arrange
         fractionToRemove = bound(fractionToRemove, 0, 1e18);
-        uint256 lpTokenAmount = totalLpTokenAmount * fractionToRemove / 1e18;
-        uint256 expectedBaseTokenAmount = totalBaseTokenAmount * lpTokenAmount / lpToken.totalSupply();
-        uint256 expectedFractionalTokenAmount = totalFractionalTokenAmount * lpTokenAmount / lpToken.totalSupply();
+        uint256 lpTokenAmount = lpToken.totalSupply() * fractionToRemove / 1e18;
+        uint256 expectedBaseTokenAmount = p.baseTokenReserves() * lpTokenAmount / lpToken.totalSupply();
+        uint256 expectedFractionalTokenAmount = p.fractionalTokenReserves() * lpTokenAmount / lpToken.totalSupply();
 
         // act
         (uint256 baseTokenAmount, uint256 fractionalTokenAmount) =
