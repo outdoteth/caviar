@@ -30,7 +30,7 @@ contract NftAddTest is Fixture {
         uint256 expectedLpTokenAmount = minLpTokenAmount;
 
         // act
-        uint256 lpTokenAmount = p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, proofs);
+        uint256 lpTokenAmount = p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, 0, type(uint256).max, proofs);
 
         // assert
         assertEq(lpTokenAmount, expectedLpTokenAmount, "Should have returned correct lp token amount");
@@ -44,7 +44,7 @@ contract NftAddTest is Fixture {
         uint256 balanceBefore = usd.balanceOf(address(this));
 
         // act
-        p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, proofs);
+        p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, 0, type(uint256).max, proofs);
 
         // assert
         uint256 balanceAfter = usd.balanceOf(address(this));
@@ -57,7 +57,7 @@ contract NftAddTest is Fixture {
         uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * tokenIds.length * 1e18);
 
         // act
-        p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, proofs);
+        p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, 0, type(uint256).max, proofs);
 
         // assert
         for (uint256 i = 0; i < tokenIds.length; i++) {
@@ -71,7 +71,7 @@ contract NftAddTest is Fixture {
 
         // act
         vm.expectRevert("Slippage: lp token amount out");
-        p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, proofs);
+        p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, 0, type(uint256).max, proofs);
     }
 
     function testItMintsLpTokensAfterInit() public {
@@ -79,7 +79,7 @@ contract NftAddTest is Fixture {
         uint256 fractionalTokenAmount = 101 * 1e18;
         deal(address(p), address(this), fractionalTokenAmount, true);
         uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * tokenIds.length * 1e18);
-        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount); // initial add
+        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max); // initial add
         uint256 lpTokenSupplyBefore = lpToken.totalSupply();
 
         uint256 expectedLpTokenAmount = (lpToken.totalSupply() * tokenIds.length * 1e18) / p.fractionalTokenReserves();
@@ -98,7 +98,7 @@ contract NftAddTest is Fixture {
         }
 
         // act
-        uint256 lpTokenAmount = p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, proofs);
+        uint256 lpTokenAmount = p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, 0, type(uint256).max, proofs);
         vm.stopPrank();
 
         // assert
@@ -112,14 +112,14 @@ contract NftAddTest is Fixture {
         uint256 fractionalTokenAmount = 101 * 1e18;
         uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * tokenIds.length * 1e18);
         deal(address(p), address(this), fractionalTokenAmount, true);
-        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount); // initial add
+        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max); // initial add
 
         minLpTokenAmount = (lpToken.totalSupply() * tokenIds.length * 1e18) / p.fractionalTokenReserves() + 1; // add 1 to cause a revert
         baseTokenAmount = ((p.baseTokenReserves() + 100) * tokenIds.length * 1e18) / p.fractionalTokenReserves();
 
         // act
         vm.expectRevert("Slippage: lp token amount out");
-        p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, proofs);
+        p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, 0, type(uint256).max, proofs);
     }
 
     function testItAddsWithMerkleProof() public {
@@ -131,7 +131,7 @@ contract NftAddTest is Fixture {
         usd.approve(address(pair), type(uint256).max);
 
         // act
-        pair.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, proofs);
+        pair.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, 0, type(uint256).max, proofs);
 
         // assert
         for (uint256 i = 0; i < tokenIds.length; i++) {

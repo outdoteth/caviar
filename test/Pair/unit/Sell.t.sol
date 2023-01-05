@@ -23,14 +23,16 @@ contract SellTest is Fixture {
         usd.approve(address(p), type(uint256).max);
 
         uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount);
-        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount);
+        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max);
 
         minOutputAmount =
             (inputAmount * 997 * p.baseTokenReserves()) / ((p.fractionalTokenReserves() * 1000 + inputAmount * 997));
         deal(address(p), address(this), inputAmount, true);
 
         deal(address(ethPair), address(this), fractionalTokenAmount, true);
-        ethPair.add{value: baseTokenAmount}(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount);
+        ethPair.add{value: baseTokenAmount}(
+            baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max
+        );
         deal(address(ethPair), address(this), inputAmount, true);
     }
 

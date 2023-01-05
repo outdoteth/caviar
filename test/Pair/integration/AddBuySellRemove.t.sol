@@ -22,7 +22,7 @@ contract AddBuySellRemoveTest is Fixture {
         deal(address(p), address(this), addFractionalTokenAmount, true);
         uint256 lpTokenAmount = Math.sqrt(addBaseTokenAmount * addFractionalTokenAmount);
         usd.approve(address(p), type(uint256).max);
-        p.add(addBaseTokenAmount, addFractionalTokenAmount, lpTokenAmount);
+        p.add(addBaseTokenAmount, addFractionalTokenAmount, lpTokenAmount, 0, type(uint256).max);
 
         // buy some amount
         uint256 baseTokenBuyAmount = p.buyQuote(buyTokenAmount);
