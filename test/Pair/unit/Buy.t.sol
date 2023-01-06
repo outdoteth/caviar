@@ -8,6 +8,8 @@ import "../../shared/Fixture.t.sol";
 import "../../../src/Caviar.sol";
 
 contract BuyTest is Fixture {
+    using stdStorage for StdStorage;
+
     event Buy(uint256 inputAmount, uint256 outputAmount);
 
     uint256 public outputAmount = 0.1e18;
@@ -26,7 +28,7 @@ contract BuyTest is Fixture {
         p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max);
 
         maxInputAmount =
-            (outputAmount * p.baseTokenReserves() * 1000) / ((p.fractionalTokenReserves() - outputAmount) * 997);
+            (outputAmount * p.baseTokenReserves() * 1000) / ((p.fractionalTokenReserves() - outputAmount) * 997) + 1;
         deal(address(usd), address(this), maxInputAmount, true);
 
         deal(address(ethPair), address(this), fractionalTokenAmount, true);
@@ -144,5 +146,35 @@ contract BuyTest is Fixture {
         vm.expectEmit(true, true, true, true);
         emit Buy(maxInputAmount, outputAmount);
         p.buy(outputAmount, maxInputAmount);
+    }
+
+    function testItRoundsUpBuyQuote() public {
+        // arrange
+        uint256 baseTokenReserves = 10;
+        uint256 fractionalTokenReserves = 10;
+        outputAmount = 9;
+
+        // (9 * 1000 * 10) / ((10 - 9) * 997) = 90.27
+        uint256 expectedInputAmount = 91;
+
+        // forgefmt: disable-next-item
+        stdstore
+            .target(address(usd))
+            .sig("balanceOf(address)")
+            .with_key(address(p))
+            .checked_write(baseTokenReserves);
+
+        // forgefmt: disable-next-item
+        stdstore
+            .target(address(p))
+            .sig("balanceOf(address)")
+            .with_key(address(p))
+            .checked_write(fractionalTokenReserves);
+
+        // act
+        uint256 inputAmount = p.buyQuote(outputAmount);
+
+        // assert
+        assertEq(inputAmount, expectedInputAmount, "Should have rounded up");
     }
 }
