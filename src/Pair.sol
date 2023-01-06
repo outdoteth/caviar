@@ -280,8 +280,12 @@ contract Pair is ERC20, ERC721TokenReceiver {
         // *** Interactions *** //
 
         // transfer nfts from sender
-        for (uint256 i = 0; i < tokenIds.length; i++) {
+        for (uint256 i = 0; i < tokenIds.length;) {
             ERC721(nft).safeTransferFrom(msg.sender, address(this), tokenIds[i]);
+
+            unchecked {
+                i++;
+            }
         }
 
         emit Wrap(tokenIds);
@@ -309,8 +313,12 @@ contract Pair is ERC20, ERC721TokenReceiver {
         }
 
         // transfer nfts to sender
-        for (uint256 i = 0; i < tokenIds.length; i++) {
+        for (uint256 i = 0; i < tokenIds.length;) {
             ERC721(nft).safeTransferFrom(address(this), msg.sender, tokenIds[i]);
+
+            unchecked {
+                i++;
+            }
         }
 
         emit Unwrap(tokenIds);
@@ -544,7 +552,7 @@ contract Pair is ERC20, ERC721TokenReceiver {
         if (merkleRoot == bytes32(0)) return;
 
         // validate merkle proofs against merkle root
-        for (uint256 i = 0; i < tokenIds.length; i++) {
+        for (uint256 i = 0; i < tokenIds.length;) {
             bool isValid = MerkleProofLib.verify(
                 proofs[i],
                 merkleRoot,
@@ -553,6 +561,10 @@ contract Pair is ERC20, ERC721TokenReceiver {
             );
 
             require(isValid, "Invalid merkle proof");
+
+            unchecked {
+                i++;
+            }
         }
     }
 
