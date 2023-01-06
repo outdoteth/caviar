@@ -8,7 +8,7 @@ import "../../shared/Fixture.t.sol";
 import "../../../src/Caviar.sol";
 
 contract WrapTest is Fixture {
-    event Wrap(uint256[] tokenIds);
+    event Wrap(uint256[] indexed tokenIds);
 
     uint256[] public tokenIds;
     bytes32[][] public proofs;
