@@ -18,11 +18,11 @@ contract BuySellTest is Fixture {
         usd.approve(address(p), type(uint256).max);
 
         uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) - 1000;
-        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max);
+        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max, 0);
 
         deal(address(ethPair), address(this), fractionalTokenAmount, true);
         ethPair.add{value: baseTokenAmount}(
-            baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max
+            baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max, 0
         );
     }
 
@@ -33,8 +33,8 @@ contract BuySellTest is Fixture {
         deal(address(usd), address(this), maxInputAmount, true);
 
         // act
-        p.buy(outputAmount, maxInputAmount);
-        p.sell(outputAmount, 0);
+        p.buy(outputAmount, maxInputAmount, 0);
+        p.sell(outputAmount, 0, 0);
 
         // assert
         assertApproxEqAbs(

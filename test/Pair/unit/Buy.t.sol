@@ -25,7 +25,7 @@ contract BuyTest is Fixture {
         usd.approve(address(p), type(uint256).max);
 
         uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) - 1000;
-        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max);
+        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max, 0);
 
         maxInputAmount =
             (outputAmount * p.baseTokenReserves() * 1000) / ((p.fractionalTokenReserves() - outputAmount) * 997) + 1;
@@ -33,7 +33,7 @@ contract BuyTest is Fixture {
 
         deal(address(ethPair), address(this), fractionalTokenAmount, true);
         ethPair.add{value: baseTokenAmount}(
-            baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max
+            baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max, 0
         );
     }
 
@@ -42,10 +42,20 @@ contract BuyTest is Fixture {
         uint256 expectedInputAmount = maxInputAmount;
 
         // act
-        uint256 inputAmount = p.buy(outputAmount, maxInputAmount);
+        uint256 inputAmount = p.buy(outputAmount, maxInputAmount, 0);
 
         // assert
         assertEq(inputAmount, expectedInputAmount, "Should have returned input amount");
+    }
+
+    function testItRevertsIfDeadlinePassed() public {
+        // arrange
+        skip(100);
+        uint256 deadline = block.timestamp - 1;
+
+        // act
+        vm.expectRevert("Expired");
+        p.buy(outputAmount, maxInputAmount, deadline);
     }
 
     function testItTransfersBaseTokens() public {
@@ -54,7 +64,7 @@ contract BuyTest is Fixture {
         uint256 thisBalanceBefore = usd.balanceOf(address(this));
 
         // act
-        p.buy(outputAmount, maxInputAmount);
+        p.buy(outputAmount, maxInputAmount, 0);
 
         // assert
         assertEq(
@@ -73,7 +83,7 @@ contract BuyTest is Fixture {
         uint256 thisBalanceBefore = p.balanceOf(address(this));
 
         // act
-        p.buy(outputAmount, maxInputAmount);
+        p.buy(outputAmount, maxInputAmount, 0);
 
         // assert
         assertEq(
@@ -92,13 +102,13 @@ contract BuyTest is Fixture {
 
         // act
         vm.expectRevert("Slippage: amount in");
-        p.buy(outputAmount, maxInputAmount);
+        p.buy(outputAmount, maxInputAmount, 0);
     }
 
     function testItRevertsIfValueIsGreaterThanZeroAndBaseTokenIsNot0() public {
         // act
         vm.expectRevert("Invalid ether input");
-        p.buy{value: maxInputAmount}(outputAmount, maxInputAmount);
+        p.buy{value: maxInputAmount}(outputAmount, maxInputAmount, 0);
     }
 
     function testItTransfersEther() public {
@@ -107,7 +117,7 @@ contract BuyTest is Fixture {
         uint256 thisBalanceBefore = address(this).balance;
 
         // act
-        ethPair.buy{value: maxInputAmount}(outputAmount, maxInputAmount);
+        ethPair.buy{value: maxInputAmount}(outputAmount, maxInputAmount, 0);
 
         // assert
         assertEq(address(ethPair).balance - balanceBefore, maxInputAmount, "Should have transferred ether to pair");
@@ -122,7 +132,7 @@ contract BuyTest is Fixture {
         uint256 thisBalanceBefore = address(this).balance;
 
         // act
-        ethPair.buy{value: maxInputAmount}(outputAmount, maxInputAmount);
+        ethPair.buy{value: maxInputAmount}(outputAmount, maxInputAmount, 0);
 
         // assert
         assertEq(
@@ -138,14 +148,14 @@ contract BuyTest is Fixture {
     function testItRevertsIfMaxInputAmountIsNotEqualToValue() public {
         // act
         vm.expectRevert("Invalid ether input");
-        ethPair.buy{value: maxInputAmount + 100}(outputAmount, maxInputAmount);
+        ethPair.buy{value: maxInputAmount + 100}(outputAmount, maxInputAmount, 0);
     }
 
     function testItEmitsBuyEvent() public {
         // act
         vm.expectEmit(true, true, true, true);
         emit Buy(maxInputAmount, outputAmount);
-        p.buy(outputAmount, maxInputAmount);
+        p.buy(outputAmount, maxInputAmount, 0);
     }
 
     function testItRoundsUpBuyQuote() public {

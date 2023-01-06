@@ -20,16 +20,16 @@ contract RemoveTest is Fixture {
 
         usd.approve(address(p), type(uint256).max);
 
-        p.add(totalBaseTokenAmount, totalFractionalTokenAmount, 0, 0, type(uint256).max);
-        totalLpTokenAmount = p.add(totalBaseTokenAmount, totalFractionalTokenAmount, 0, 0, type(uint256).max);
+        p.add(totalBaseTokenAmount, totalFractionalTokenAmount, 0, 0, type(uint256).max, 0);
+        totalLpTokenAmount = p.add(totalBaseTokenAmount, totalFractionalTokenAmount, 0, 0, type(uint256).max, 0);
 
         deal(address(ethPair), address(this), totalFractionalTokenAmount * 2, true);
         ethPair.add{value: totalBaseTokenAmount}(
-            totalBaseTokenAmount, totalFractionalTokenAmount, 0, 0, type(uint256).max
+            totalBaseTokenAmount, totalFractionalTokenAmount, 0, 0, type(uint256).max, 0
         );
 
         ethPair.add{value: totalBaseTokenAmount}(
-            totalBaseTokenAmount, totalFractionalTokenAmount, 0, 0, type(uint256).max
+            totalBaseTokenAmount, totalFractionalTokenAmount, 0, 0, type(uint256).max, 0
         );
     }
 
@@ -41,7 +41,7 @@ contract RemoveTest is Fixture {
 
         // act
         (uint256 baseTokenAmount, uint256 fractionalTokenAmount) =
-            p.remove(lpTokenAmount, expectedBaseTokenAmount, expectedFractionalTokenAmount);
+            p.remove(lpTokenAmount, expectedBaseTokenAmount, expectedFractionalTokenAmount, 0);
 
         // assert
         assertEq(baseTokenAmount, expectedBaseTokenAmount, "Should have returned correct base token amount");
@@ -59,7 +59,7 @@ contract RemoveTest is Fixture {
         uint256 totalSupplyBefore = lpToken.totalSupply();
 
         // act
-        p.remove(lpTokenAmount, minBaseTokenOutputAmount, minFractionalTokenOutputAmount);
+        p.remove(lpTokenAmount, minBaseTokenOutputAmount, minFractionalTokenOutputAmount, 0);
 
         // assert
         assertEq(
@@ -77,7 +77,7 @@ contract RemoveTest is Fixture {
         uint256 balanceBefore = usd.balanceOf(address(p));
 
         // act
-        p.remove(lpTokenAmount, minBaseTokenOutputAmount, minFractionalTokenOutputAmount);
+        p.remove(lpTokenAmount, minBaseTokenOutputAmount, minFractionalTokenOutputAmount, 0);
 
         // assert
         assertEq(
@@ -102,7 +102,7 @@ contract RemoveTest is Fixture {
         uint256 balanceBefore = p.balanceOf(address(p));
 
         // act
-        p.remove(lpTokenAmount, minBaseTokenOutputAmount, minFractionalTokenOutputAmount);
+        p.remove(lpTokenAmount, minBaseTokenOutputAmount, minFractionalTokenOutputAmount, 0);
 
         // assert
         assertEq(
@@ -126,7 +126,7 @@ contract RemoveTest is Fixture {
 
         // act
         vm.expectRevert("Slippage: fractional token out");
-        p.remove(lpTokenAmount, minBaseTokenOutputAmount, minFractionalTokenOutputAmount);
+        p.remove(lpTokenAmount, minBaseTokenOutputAmount, minFractionalTokenOutputAmount, 0);
     }
 
     function testItRevertsBaseTokenSlippage() public {
@@ -137,7 +137,7 @@ contract RemoveTest is Fixture {
 
         // act
         vm.expectRevert("Slippage: base token amount out");
-        p.remove(lpTokenAmount, minBaseTokenOutputAmount, minFractionalTokenOutputAmount);
+        p.remove(lpTokenAmount, minBaseTokenOutputAmount, minFractionalTokenOutputAmount, 0);
     }
 
     function testItTransfersEther() public {
@@ -149,7 +149,7 @@ contract RemoveTest is Fixture {
         uint256 balanceBefore = address(ethPair).balance;
 
         // act
-        ethPair.remove(lpTokenAmount, minBaseTokenOutputAmount, minFractionalTokenOutputAmount);
+        ethPair.remove(lpTokenAmount, minBaseTokenOutputAmount, minFractionalTokenOutputAmount, 0);
 
         // assert
         assertEq(
@@ -174,7 +174,17 @@ contract RemoveTest is Fixture {
         // act
         vm.expectEmit(true, true, true, true);
         emit Remove(expectedBaseTokenAmount, expectedFractionalTokenAmount, lpTokenAmount);
-        p.remove(lpTokenAmount, expectedBaseTokenAmount, expectedFractionalTokenAmount);
+        p.remove(lpTokenAmount, expectedBaseTokenAmount, expectedFractionalTokenAmount, 0);
+    }
+
+    function testItRevertsIfDeadlinePassed() public {
+        // arrange
+        skip(100);
+        uint256 deadline = block.timestamp - 1;
+
+        // act
+        vm.expectRevert("Expired");
+        p.remove(0, 0, 0, deadline);
     }
 
     function testItReturnsBaseTokenAmountAndFractionalTokenAmount(uint256 fractionToRemove) public {
@@ -186,7 +196,7 @@ contract RemoveTest is Fixture {
 
         // act
         (uint256 baseTokenAmount, uint256 fractionalTokenAmount) =
-            p.remove(lpTokenAmount, expectedBaseTokenAmount, expectedFractionalTokenAmount);
+            p.remove(lpTokenAmount, expectedBaseTokenAmount, expectedFractionalTokenAmount, 0);
 
         // assert
         assertEq(baseTokenAmount, expectedBaseTokenAmount, "Should have returned correct base token amount");

@@ -24,7 +24,7 @@ contract NftRemoveTest is Fixture {
         usd.approve(address(p), type(uint256).max);
 
         uint256 minLpTokenAmount = Math.sqrt(totalBaseTokenAmount * tokenIds.length * 1e18) - 1000;
-        totalLpTokenAmount = p.nftAdd(totalBaseTokenAmount, tokenIds, minLpTokenAmount, 0, type(uint256).max, proofs);
+        totalLpTokenAmount = p.nftAdd(totalBaseTokenAmount, tokenIds, minLpTokenAmount, 0, 0, type(uint256).max, proofs);
 
         tokenIds.pop();
         tokenIds.pop();
@@ -39,7 +39,7 @@ contract NftRemoveTest is Fixture {
 
         // act
         (uint256 baseTokenAmount, uint256 fractionalTokenAmount) =
-            p.nftRemove(lpTokenAmount, expectedBaseTokenAmount, tokenIds, false);
+            p.nftRemove(lpTokenAmount, expectedBaseTokenAmount, 0, tokenIds, false);
 
         // assert
         assertEq(baseTokenAmount, expectedBaseTokenAmount, "Should have returned correct base token amount");
@@ -57,7 +57,7 @@ contract NftRemoveTest is Fixture {
         uint256 totalSupplyBefore = lpToken.totalSupply();
 
         // act
-        p.nftRemove(lpTokenAmount, minBaseTokenOutputAmount, tokenIds, false);
+        p.nftRemove(lpTokenAmount, minBaseTokenOutputAmount, 0, tokenIds, false);
 
         // assert
         assertEq(
@@ -75,7 +75,7 @@ contract NftRemoveTest is Fixture {
         uint256 balanceBefore = usd.balanceOf(address(p));
 
         // act
-        p.nftRemove(lpTokenAmount, minBaseTokenOutputAmount, tokenIds, false);
+        p.nftRemove(lpTokenAmount, minBaseTokenOutputAmount, 0, tokenIds, false);
 
         // assert
         assertEq(
@@ -91,6 +91,16 @@ contract NftRemoveTest is Fixture {
         );
     }
 
+    function testItRevertsIfDeadlinePassed() public {
+        // arrange
+        skip(100);
+        uint256 deadline = block.timestamp - 1;
+
+        // act
+        vm.expectRevert("Expired");
+        p.nftRemove(0, 0, deadline, tokenIds, false);
+    }
+
     function testItTransfersNfts() public {
         // arrange
         uint256 lpTokenAmount = (lpToken.totalSupply() * tokenIds.length * 1e18) / p.fractionalTokenReserves();
@@ -98,7 +108,7 @@ contract NftRemoveTest is Fixture {
             (p.baseTokenReserves() * tokenIds.length * 1e18) / p.fractionalTokenReserves();
 
         // act
-        p.nftRemove(lpTokenAmount, minBaseTokenOutputAmount, tokenIds, false);
+        p.nftRemove(lpTokenAmount, minBaseTokenOutputAmount, 0, tokenIds, false);
 
         // assert
         for (uint256 i = 0; i < tokenIds.length; i++) {
@@ -115,7 +125,7 @@ contract NftRemoveTest is Fixture {
 
         // act
         vm.expectRevert("Slippage: fractional token out");
-        p.nftRemove(lpTokenAmount, minBaseTokenOutputAmount, tokenIds, false);
+        p.nftRemove(lpTokenAmount, minBaseTokenOutputAmount, 0, tokenIds, false);
     }
 
     function testItRevertsBaseTokenSlippage() public {
@@ -126,6 +136,6 @@ contract NftRemoveTest is Fixture {
 
         // act
         vm.expectRevert("Slippage: base token amount out");
-        p.nftRemove(lpTokenAmount, minBaseTokenOutputAmount, tokenIds, false);
+        p.nftRemove(lpTokenAmount, minBaseTokenOutputAmount, 0, tokenIds, false);
     }
 }

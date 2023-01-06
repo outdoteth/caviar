@@ -21,7 +21,7 @@ contract NftSellTest is Fixture {
         usd.approve(address(p), type(uint256).max);
 
         uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) - 1000;
-        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max);
+        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max, 0);
 
         for (uint256 i = 0; i < 5; i++) {
             bayc.mint(address(this), i);
@@ -39,7 +39,7 @@ contract NftSellTest is Fixture {
         uint256 expectedOutputAmount = minOutputAmount;
 
         // act
-        uint256 outputAmount = p.nftSell(tokenIds, expectedOutputAmount, proofs);
+        uint256 outputAmount = p.nftSell(tokenIds, expectedOutputAmount, 0, proofs);
 
         // assert
         assertEq(outputAmount, expectedOutputAmount, "Should have returned output amount");
@@ -51,7 +51,7 @@ contract NftSellTest is Fixture {
         uint256 thisBalanceBefore = usd.balanceOf(address(this));
 
         // act
-        p.nftSell(tokenIds, minOutputAmount, proofs);
+        p.nftSell(tokenIds, minOutputAmount, 0, proofs);
 
         // assert
         assertEq(
@@ -67,7 +67,7 @@ contract NftSellTest is Fixture {
 
     function testItTransfersNfts() public {
         // act
-        p.nftSell(tokenIds, minOutputAmount, proofs);
+        p.nftSell(tokenIds, minOutputAmount, 0, proofs);
 
         // assert
         for (uint256 i = 0; i < tokenIds.length; i++) {
@@ -81,7 +81,17 @@ contract NftSellTest is Fixture {
 
         // act
         vm.expectRevert("Slippage: amount out");
-        p.nftSell(tokenIds, minOutputAmount, proofs);
+        p.nftSell(tokenIds, minOutputAmount, 0, proofs);
+    }
+
+    function testItRevertsIfDeadlinePassed() public {
+        // arrange
+        skip(100);
+        uint256 deadline = block.timestamp - 1;
+
+        // act
+        vm.expectRevert("Expired");
+        p.nftSell(tokenIds, minOutputAmount, deadline, proofs);
     }
 
     function testItMintsFractionalTokens() public {
@@ -90,7 +100,7 @@ contract NftSellTest is Fixture {
         uint256 balanceBefore = p.balanceOf(address(p));
 
         // act
-        p.nftSell(tokenIds, minOutputAmount, proofs);
+        p.nftSell(tokenIds, minOutputAmount, 0, proofs);
 
         // assert
         assertEq(p.totalSupply() - totalSupplyBefore, tokenIds.length * 1e18, "Should have minted fractional tokens");
@@ -112,13 +122,13 @@ contract NftSellTest is Fixture {
         usd.approve(address(pair), type(uint256).max);
 
         uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) - 1000;
-        pair.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max);
+        pair.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max, 0);
 
         proofs = createPairScript.generateMerkleProofs("YEET-mids.json", tokenIds);
         bayc.setApprovalForAll(address(pair), true);
 
         // act
-        pair.nftSell(tokenIds, minOutputAmount, proofs);
+        pair.nftSell(tokenIds, minOutputAmount, 0, proofs);
 
         // assert
         for (uint256 i = 0; i < tokenIds.length; i++) {

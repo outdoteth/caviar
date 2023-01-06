@@ -63,15 +63,20 @@ contract Pair is ERC20, ERC721TokenReceiver {
     /// @param minLpTokenAmount The minimum amount of LP tokens to mint.
     /// @param minPrice The minimum price that the pool should currently be at.
     /// @param maxPrice The maximum price that the pool should currently be at.
+    /// @param deadline The deadline before the trade expires.
     /// @return lpTokenAmount The amount of LP tokens minted.
     function add(
         uint256 baseTokenAmount,
         uint256 fractionalTokenAmount,
         uint256 minLpTokenAmount,
         uint256 minPrice,
-        uint256 maxPrice
+        uint256 maxPrice,
+        uint256 deadline
     ) public payable returns (uint256 lpTokenAmount) {
         // *** Checks *** //
+
+        // check that the trade has not expired
+        require(deadline == 0 || deadline >= block.timestamp, "Expired");
 
         // check the token amount inputs are not zero
         require(baseTokenAmount > 0 && fractionalTokenAmount > 0, "Input token amount is zero");
@@ -121,13 +126,19 @@ contract Pair is ERC20, ERC721TokenReceiver {
     /// @param lpTokenAmount The amount of LP tokens to burn.
     /// @param minBaseTokenOutputAmount The minimum amount of base tokens to receive.
     /// @param minFractionalTokenOutputAmount The minimum amount of fractional tokens to receive.
+    /// @param deadline The deadline before the trade expires.
     /// @return baseTokenOutputAmount The amount of base tokens received.
     /// @return fractionalTokenOutputAmount The amount of fractional tokens received.
-    function remove(uint256 lpTokenAmount, uint256 minBaseTokenOutputAmount, uint256 minFractionalTokenOutputAmount)
-        public
-        returns (uint256 baseTokenOutputAmount, uint256 fractionalTokenOutputAmount)
-    {
+    function remove(
+        uint256 lpTokenAmount,
+        uint256 minBaseTokenOutputAmount,
+        uint256 minFractionalTokenOutputAmount,
+        uint256 deadline
+    ) public returns (uint256 baseTokenOutputAmount, uint256 fractionalTokenOutputAmount) {
         // *** Checks *** //
+
+        // check that the trade has not expired
+        require(deadline == 0 || deadline >= block.timestamp, "Expired");
 
         // calculate the output amounts
         (baseTokenOutputAmount, fractionalTokenOutputAmount) = removeQuote(lpTokenAmount);
@@ -162,9 +173,17 @@ contract Pair is ERC20, ERC721TokenReceiver {
     /// @notice Buys fractional tokens from the pair.
     /// @param outputAmount The amount of fractional tokens to buy.
     /// @param maxInputAmount The maximum amount of base tokens to spend.
+    /// @param deadline The deadline before the trade expires.
     /// @return inputAmount The amount of base tokens spent.
-    function buy(uint256 outputAmount, uint256 maxInputAmount) public payable returns (uint256 inputAmount) {
+    function buy(uint256 outputAmount, uint256 maxInputAmount, uint256 deadline)
+        public
+        payable
+        returns (uint256 inputAmount)
+    {
         // *** Checks *** //
+
+        // check that the trade has not expired
+        require(deadline == 0 || deadline >= block.timestamp, "Expired");
 
         // check that correct eth input was sent - if the baseToken equals address(0) then native ETH is used
         require(baseToken == address(0) ? msg.value == maxInputAmount : msg.value == 0, "Invalid ether input");
@@ -196,10 +215,17 @@ contract Pair is ERC20, ERC721TokenReceiver {
 
     /// @notice Sells fractional tokens to the pair.
     /// @param inputAmount The amount of fractional tokens to sell.
+    /// @param deadline The deadline before the trade expires.
     /// @param minOutputAmount The minimum amount of base tokens to receive.
     /// @return outputAmount The amount of base tokens received.
-    function sell(uint256 inputAmount, uint256 minOutputAmount) public returns (uint256 outputAmount) {
+    function sell(uint256 inputAmount, uint256 minOutputAmount, uint256 deadline)
+        public
+        returns (uint256 outputAmount)
+    {
         // *** Checks *** //
+
+        // check that the trade has not expired
+        require(deadline == 0 || deadline >= block.timestamp, "Expired");
 
         // calculate output amount using xyk invariant
         outputAmount = sellQuote(inputAmount);
@@ -300,6 +326,7 @@ contract Pair is ERC20, ERC721TokenReceiver {
     /// @param minLpTokenAmount The minimum amount of lp tokens to receive.
     /// @param minPrice The minimum price of the pair.
     /// @param maxPrice The maximum price of the pair.
+    /// @param deadline The deadline for the transaction.
     /// @param proofs The merkle proofs for the NFTs.
     /// @return lpTokenAmount The amount of lp tokens minted.
     function nftAdd(
@@ -308,18 +335,20 @@ contract Pair is ERC20, ERC721TokenReceiver {
         uint256 minLpTokenAmount,
         uint256 minPrice,
         uint256 maxPrice,
+        uint256 deadline,
         bytes32[][] calldata proofs
     ) public payable returns (uint256 lpTokenAmount) {
         // wrap the incoming NFTs into fractional tokens
         uint256 fractionalTokenAmount = wrap(tokenIds, proofs);
 
         // add liquidity using the fractional tokens and base tokens
-        lpTokenAmount = add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, minPrice, maxPrice);
+        lpTokenAmount = add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, minPrice, maxPrice, deadline);
     }
 
     /// @notice Removes liquidity from the pair using NFTs.
     /// @param lpTokenAmount The amount of lp tokens to remove.
     /// @param minBaseTokenOutputAmount The minimum amount of base tokens to receive.
+    /// @param deadline The deadline before the trade expires.
     /// @param tokenIds The ids of the NFTs to remove.
     /// @param withFee Whether to pay a fee for unwrapping or not.
     /// @return baseTokenOutputAmount The amount of base tokens received.
@@ -327,12 +356,13 @@ contract Pair is ERC20, ERC721TokenReceiver {
     function nftRemove(
         uint256 lpTokenAmount,
         uint256 minBaseTokenOutputAmount,
+        uint256 deadline,
         uint256[] calldata tokenIds,
         bool withFee
     ) public returns (uint256 baseTokenOutputAmount, uint256 fractionalTokenOutputAmount) {
         // remove liquidity and send fractional tokens and base tokens to sender
         (baseTokenOutputAmount, fractionalTokenOutputAmount) =
-            remove(lpTokenAmount, minBaseTokenOutputAmount, tokenIds.length * ONE);
+            remove(lpTokenAmount, minBaseTokenOutputAmount, tokenIds.length * ONE, deadline);
 
         // unwrap the fractional tokens into NFTs and send to sender
         unwrap(tokenIds, withFee);
@@ -341,10 +371,15 @@ contract Pair is ERC20, ERC721TokenReceiver {
     /// @notice Buys NFTs from the pair using base tokens.
     /// @param tokenIds The ids of the NFTs to buy.
     /// @param maxInputAmount The maximum amount of base tokens to spend.
+    /// @param deadline The deadline before the trade expires.
     /// @return inputAmount The amount of base tokens spent.
-    function nftBuy(uint256[] calldata tokenIds, uint256 maxInputAmount) public payable returns (uint256 inputAmount) {
+    function nftBuy(uint256[] calldata tokenIds, uint256 maxInputAmount, uint256 deadline)
+        public
+        payable
+        returns (uint256 inputAmount)
+    {
         // buy fractional tokens using base tokens
-        inputAmount = buy(tokenIds.length * ONE, maxInputAmount);
+        inputAmount = buy(tokenIds.length * ONE, maxInputAmount, deadline);
 
         // unwrap the fractional tokens into NFTs and send to sender
         unwrap(tokenIds, false);
@@ -353,17 +388,20 @@ contract Pair is ERC20, ERC721TokenReceiver {
     /// @notice Sells NFTs to the pair for base tokens.
     /// @param tokenIds The ids of the NFTs to sell.
     /// @param minOutputAmount The minimum amount of base tokens to receive.
+    /// @param deadline The deadline before the trade expires.
     /// @param proofs The merkle proofs for the NFTs.
     /// @return outputAmount The amount of base tokens received.
-    function nftSell(uint256[] calldata tokenIds, uint256 minOutputAmount, bytes32[][] calldata proofs)
-        public
-        returns (uint256 outputAmount)
-    {
+    function nftSell(
+        uint256[] calldata tokenIds,
+        uint256 minOutputAmount,
+        uint256 deadline,
+        bytes32[][] calldata proofs
+    ) public returns (uint256 outputAmount) {
         // wrap the incoming NFTs into fractional tokens
         uint256 inputAmount = wrap(tokenIds, proofs);
 
         // sell fractional tokens for base tokens
-        outputAmount = sell(inputAmount, minOutputAmount);
+        outputAmount = sell(inputAmount, minOutputAmount, deadline);
     }
 
     // ****************************** //

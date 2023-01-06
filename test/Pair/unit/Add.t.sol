@@ -33,7 +33,7 @@ contract AddTest is Fixture {
         uint256 balanceBefore = usd.balanceOf(address(this));
 
         // act
-        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max);
+        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max, 0);
 
         // assert
         uint256 balanceAfter = usd.balanceOf(address(this));
@@ -47,7 +47,7 @@ contract AddTest is Fixture {
         uint256 balanceBefore = p.balanceOf(address(this));
 
         // act
-        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max);
+        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max, 0);
 
         // assert
         assertEq(p.balanceOf(address(p)), fractionalTokenAmount, "Should have transferred fractional tokens to pair");
@@ -64,13 +64,13 @@ contract AddTest is Fixture {
 
         // act
         vm.expectRevert("Slippage: lp token amount out");
-        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max);
+        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max, 0);
     }
 
     function testItMintsLpTokensAfterInit() public {
         // arrange
         uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) - 1000;
-        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max); // initial add
+        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max, 0); // initial add
         uint256 lpTokenSupplyBefore = lpToken.totalSupply();
 
         uint256 expectedLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) * 17;
@@ -83,7 +83,7 @@ contract AddTest is Fixture {
         // act
         vm.startPrank(babe);
         usd.approve(address(p), type(uint256).max);
-        uint256 lpTokenAmount = p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max);
+        uint256 lpTokenAmount = p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max, 0);
         vm.stopPrank();
 
         // assert
@@ -95,7 +95,7 @@ contract AddTest is Fixture {
     function testItRevertsIfPriceIsGreaterThanMax() public {
         // arrange
         uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) - 1000;
-        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max); // initial add
+        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max, 0); // initial add
 
         uint256 expectedLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) * 17;
         minLpTokenAmount = expectedLpTokenAmount;
@@ -106,13 +106,13 @@ contract AddTest is Fixture {
 
         // act
         vm.expectRevert("Slippage: price out of bounds");
-        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, 0);
+        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, 0, 0);
     }
 
     function testItRevertsIfPriceIsLessThanMin() public {
         // arrange
         uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) - 1000;
-        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max); // initial add
+        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max, 0); // initial add
 
         uint256 expectedLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) * 17;
         minLpTokenAmount = expectedLpTokenAmount;
@@ -123,13 +123,13 @@ contract AddTest is Fixture {
 
         // act
         vm.expectRevert("Slippage: price out of bounds");
-        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, type(uint256).max, type(uint256).max);
+        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, type(uint256).max, type(uint256).max, 0);
     }
 
     function testItRevertsSlippageAfterInitMint() public {
         // arrange
         uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) - 1000;
-        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max); // initial add
+        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max, 0); // initial add
 
         minLpTokenAmount = (baseTokenAmount * fractionalTokenAmount * 17) + 1; // add 1 to cause a revert
         baseTokenAmount = baseTokenAmount * 17;
@@ -137,7 +137,7 @@ contract AddTest is Fixture {
 
         // act
         vm.expectRevert("Slippage: lp token amount out");
-        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max);
+        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max, 0);
     }
 
     function testItRevertsIfValueIsNot0AndBaseTokenIsNot0() public {
@@ -148,7 +148,7 @@ contract AddTest is Fixture {
 
         // act
         vm.expectRevert("Invalid ether input");
-        p.add{value: 0.1 ether}(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max);
+        p.add{value: 0.1 ether}(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max, 0);
     }
 
     function testItRevertsIfValueDoesNotMatchBaseTokenAmount() public {
@@ -160,7 +160,7 @@ contract AddTest is Fixture {
         // act
         vm.expectRevert("Invalid ether input");
         ethPair.add{value: baseTokenAmount - 1}(
-            baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max
+            baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max, 0
         );
     }
 
@@ -171,7 +171,7 @@ contract AddTest is Fixture {
 
         // act
         ethPair.add{value: baseTokenAmount}(
-            baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max
+            baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max, 0
         );
 
         // assert
@@ -184,7 +184,7 @@ contract AddTest is Fixture {
         // arrange
         uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) - 1000;
         ethPair.add{value: baseTokenAmount}(
-            baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max
+            baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max, 0
         ); // initial add
         uint256 lpTokenSupplyBefore = ethPairLpToken.totalSupply();
 
@@ -198,7 +198,7 @@ contract AddTest is Fixture {
         vm.startPrank(babe);
         deal(babe, baseTokenAmount);
         uint256 lpTokenAmount = ethPair.add{value: baseTokenAmount}(
-            baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max
+            baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max, 0
         );
         vm.stopPrank();
 
@@ -217,16 +217,27 @@ contract AddTest is Fixture {
         // act
         vm.expectEmit(true, true, true, true);
         emit Add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount);
-        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max);
+        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max, 0);
     }
 
     function testItRevertsIfAmountIsZero() public {
         // act
         vm.expectRevert("Input token amount is zero");
-        p.add(0, fractionalTokenAmount, 0, 0, type(uint256).max);
+        p.add(0, fractionalTokenAmount, 0, 0, type(uint256).max, 0);
 
         vm.expectRevert("Input token amount is zero");
-        p.add(baseTokenAmount, 0, 0, 0, type(uint256).max);
+        p.add(baseTokenAmount, 0, 0, 0, type(uint256).max, 0);
+    }
+
+    function testItRevertsIfDeadlinePassed() public {
+        // arrange
+        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) - 1000;
+        skip(100);
+        uint256 deadline = block.timestamp - 1;
+
+        // act
+        vm.expectRevert("Expired");
+        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, 0, deadline);
     }
 
     function testItInitMintsLpTokensToSender(uint256 _baseTokenAmount, uint256 _fractionalTokenAmount) public {
@@ -241,7 +252,8 @@ contract AddTest is Fixture {
         c.transferOwnership(owner);
 
         // act
-        uint256 lpTokenAmount = p.add(_baseTokenAmount, _fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max);
+        uint256 lpTokenAmount =
+            p.add(_baseTokenAmount, _fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max, 0);
 
         // assert
         assertEq(lpTokenAmount, expectedLpTokenAmount, "Should have returned correct lp token amount");
@@ -257,7 +269,7 @@ contract AddTest is Fixture {
         deal(address(usd), address(this), _initBaseTokenAmount, true);
         deal(address(p), address(this), _initFractionalTokenAmount, true);
         uint256 initMinLpTokenAmount = Math.sqrt(_initBaseTokenAmount * _initFractionalTokenAmount) - 1000;
-        p.add(_initBaseTokenAmount, _initFractionalTokenAmount, initMinLpTokenAmount, 0, type(uint256).max); // initial add
+        p.add(_initBaseTokenAmount, _initFractionalTokenAmount, initMinLpTokenAmount, 0, type(uint256).max, 0); // initial add
         uint256 lpTokenSupplyBefore = lpToken.totalSupply();
 
         uint256 expectedLpTokenAmount = Math.sqrt(_initBaseTokenAmount * _initFractionalTokenAmount) * 17;
@@ -270,7 +282,7 @@ contract AddTest is Fixture {
         // act
         vm.startPrank(babe);
         usd.approve(address(p), type(uint256).max);
-        uint256 lpTokenAmount = p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max);
+        uint256 lpTokenAmount = p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max, 0);
         vm.stopPrank();
 
         // assert
