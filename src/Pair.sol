@@ -545,7 +545,13 @@ contract Pair is ERC20, ERC721TokenReceiver {
 
         // validate merkle proofs against merkle root
         for (uint256 i = 0; i < tokenIds.length; i++) {
-            bool isValid = MerkleProofLib.verify(proofs[i], merkleRoot, keccak256(abi.encodePacked(tokenIds[i])));
+            bool isValid = MerkleProofLib.verify(
+                proofs[i],
+                merkleRoot,
+                // double hash to prevent second-preimage attacks
+                keccak256(bytes.concat(keccak256(abi.encode(tokenIds[i]))))
+            );
+
             require(isValid, "Invalid merkle proof");
         }
     }
