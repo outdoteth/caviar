@@ -423,7 +423,8 @@ contract Pair is ERC20, ERC721TokenReceiver {
     /// @dev Calculated by dividing the base token reserves by the fractional token reserves.
     /// @return price The price of one fractional token in base tokens * 1e18.
     function price() public view returns (uint256) {
-        return (_baseTokenReserves() * ONE) / fractionalTokenReserves();
+        uint256 exponent = baseToken == address(0) ? 18 : (36 - ERC20(baseToken).decimals());
+        return (_baseTokenReserves() * 10 ** exponent) / fractionalTokenReserves();
     }
 
     /// @notice The amount of base tokens required to buy a given amount of fractional tokens.
