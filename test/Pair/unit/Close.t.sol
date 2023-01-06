@@ -8,8 +8,8 @@ import "../../shared/Fixture.t.sol";
 import "../../../src/Caviar.sol";
 
 contract CloseTest is Fixture {
-    event Close(uint256 closeTimestamp);
-    event Withdraw(uint256 tokenId);
+    event Close(uint256 indexed closeTimestamp);
+    event Withdraw(uint256 indexed tokenId);
 
     uint256[] public tokenIds;
 

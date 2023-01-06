@@ -10,7 +10,7 @@ import "../../../src/Caviar.sol";
 contract BuyTest is Fixture {
     using stdStorage for StdStorage;
 
-    event Buy(uint256 inputAmount, uint256 outputAmount);
+    event Buy(uint256 indexed inputAmount, uint256 indexed outputAmount);
 
     uint256 public outputAmount = 0.1e18;
     uint256 public maxInputAmount;

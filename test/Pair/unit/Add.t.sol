@@ -9,7 +9,7 @@ import "../../../src/Caviar.sol";
 import "../../../script/CreatePair.s.sol";
 
 contract AddTest is Fixture {
-    event Add(uint256 baseTokenAmount, uint256 fractionalTokenAmount, uint256 lpTokenAmount);
+    event Add(uint256 indexed baseTokenAmount, uint256 indexed fractionalTokenAmount, uint256 indexed lpTokenAmount);
 
     uint256 public baseTokenAmount = 10000;
     uint256 public fractionalTokenAmount = 300;

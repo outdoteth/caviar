@@ -8,7 +8,7 @@ import "../../shared/Fixture.t.sol";
 import "../../../src/Caviar.sol";
 
 contract SellTest is Fixture {
-    event Sell(uint256 inputAmount, uint256 outputAmount);
+    event Sell(uint256 indexed inputAmount, uint256 indexed outputAmount);
 
     uint256 public inputAmount = 0.337e18;
     uint256 public minOutputAmount;

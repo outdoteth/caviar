@@ -29,14 +29,14 @@ contract Pair is ERC20, ERC721TokenReceiver {
     Caviar public immutable caviar;
     uint256 public closeTimestamp;
 
-    event Add(uint256 baseTokenAmount, uint256 fractionalTokenAmount, uint256 lpTokenAmount);
-    event Remove(uint256 baseTokenAmount, uint256 fractionalTokenAmount, uint256 lpTokenAmount);
-    event Buy(uint256 inputAmount, uint256 outputAmount);
-    event Sell(uint256 inputAmount, uint256 outputAmount);
-    event Wrap(uint256[] tokenIds);
-    event Unwrap(uint256[] tokenIds);
-    event Close(uint256 closeTimestamp);
-    event Withdraw(uint256 tokenId);
+    event Add(uint256 indexed baseTokenAmount, uint256 indexed fractionalTokenAmount, uint256 indexed lpTokenAmount);
+    event Remove(uint256 indexed baseTokenAmount, uint256 indexed fractionalTokenAmount, uint256 indexed lpTokenAmount);
+    event Buy(uint256 indexed inputAmount, uint256 indexed outputAmount);
+    event Sell(uint256 indexed inputAmount, uint256 indexed outputAmount);
+    event Wrap(uint256[] indexed tokenIds);
+    event Unwrap(uint256[] indexed tokenIds);
+    event Close(uint256 indexed closeTimestamp);
+    event Withdraw(uint256 indexed tokenId);
 
     constructor(
         address _nft,
@@ -541,14 +541,14 @@ contract Pair is ERC20, ERC721TokenReceiver {
     ///      if any of the tokenId proofs are invalid.
     function _validateTokenIds(uint256[] calldata tokenIds, bytes32[][] calldata proofs) internal view {
         // if merkle root is not set then all tokens are valid
-        if (merkleRoot == bytes23(0)) return;
+        if (merkleRoot == bytes32(0)) return;
 
         // validate merkle proofs against merkle root
         for (uint256 i = 0; i < tokenIds.length; i++) {
             bool isValid = MerkleProofLib.verify(
                 proofs[i],
                 merkleRoot,
-                // double hash to prevent second-preimage attacks
+                // double hash to prevent second preimage attacks
                 keccak256(bytes.concat(keccak256(abi.encode(tokenIds[i]))))
             );
 

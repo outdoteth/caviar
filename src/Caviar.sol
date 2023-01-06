@@ -12,11 +12,11 @@ import "./Pair.sol";
 contract Caviar is Owned {
     using SafeERC20Namer for address;
 
-    event Create(address indexed nft, address indexed baseToken, bytes32 indexed merkleRoot);
-    event Destroy(address indexed nft, address indexed baseToken, bytes32 indexed merkleRoot);
-
     /// @dev pairs[nft][baseToken][merkleRoot] -> pair
     mapping(address => mapping(address => mapping(bytes32 => address))) public pairs;
+
+    event Create(address indexed nft, address indexed baseToken, bytes32 indexed merkleRoot);
+    event Destroy(address indexed nft, address indexed baseToken, bytes32 indexed merkleRoot);
 
     constructor() Owned(msg.sender) {}
 
