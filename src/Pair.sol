@@ -541,7 +541,7 @@ contract Pair is ERC20, ERC721TokenReceiver {
     ///      if any of the tokenId proofs are invalid.
     function _validateTokenIds(uint256[] calldata tokenIds, bytes32[][] calldata proofs) internal view {
         // if merkle root is not set then all tokens are valid
-        if (merkleRoot == bytes23(0)) return;
+        if (merkleRoot == bytes32(0)) return;
 
         // validate merkle proofs against merkle root
         for (uint256 i = 0; i < tokenIds.length; i++) {
