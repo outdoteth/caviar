@@ -18,8 +18,8 @@ contract Pair is ERC20, ERC721TokenReceiver {
     using SafeTransferLib for address;
     using SafeTransferLib for ERC20;
 
-    uint256 public constant ONE = 1e18;
     uint256 public constant CLOSE_GRACE_PERIOD = 7 days;
+    uint256 private constant ONE = 1e18;
     uint256 private constant MINIMUM_LIQUIDITY = 1000;
 
     address public immutable nft;

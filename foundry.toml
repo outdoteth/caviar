@@ -3,7 +3,7 @@ src = "src"
 out = "out"
 libs = ["lib"]
 solc = "0.8.17"
-optimizer_runs = 3_000
+optimizer_runs = 1000
 gas_reports = ["Pair", "Caviar", "LpToken"]
 fs_permissions = [{ access = "read", path = "./script/rankings/" }]
 ffi = true
