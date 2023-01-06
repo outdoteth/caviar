@@ -29,7 +29,7 @@ contract BuySellTest is Fixture {
     function testItBuysSellsEqualAmounts(uint256 outputAmount) public {
         outputAmount = bound(outputAmount, 1e2, p.fractionalTokenReserves() - 1e18);
         uint256 maxInputAmount =
-            (outputAmount * p.baseTokenReserves() * 1000) / ((p.fractionalTokenReserves() - outputAmount) * 997);
+            (outputAmount * p.baseTokenReserves() * 1000) / ((p.fractionalTokenReserves() - outputAmount) * 997) + 1;
         deal(address(usd), address(this), maxInputAmount, true);
 
         // act
@@ -40,7 +40,7 @@ contract BuySellTest is Fixture {
         assertApproxEqAbs(
             usd.balanceOf(address(this)),
             maxInputAmount,
-            maxInputAmount - (((maxInputAmount * 997) / 1000) * 997) / 1000, // allow margin of error for approx. fee amount
+            maxInputAmount - (((maxInputAmount * 997) / 1000) * 997) / 1000 + 1, // allow margin of error for approx. fee amount
             "Should have bought and sold equal amounts of assets"
         );
 

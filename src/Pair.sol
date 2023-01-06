@@ -5,6 +5,7 @@ import "solmate/tokens/ERC20.sol";
 import "solmate/tokens/ERC721.sol";
 import "solmate/utils/MerkleProofLib.sol";
 import "solmate/utils/SafeTransferLib.sol";
+import "solmate/utils/FixedPointMathLib.sol";
 import "openzeppelin/utils/math/Math.sol";
 
 import "./LpToken.sol";
@@ -430,7 +431,9 @@ contract Pair is ERC20, ERC721TokenReceiver {
     /// @param outputAmount The amount of fractional tokens to buy.
     /// @return inputAmount The amount of base tokens required.
     function buyQuote(uint256 outputAmount) public view returns (uint256) {
-        return (outputAmount * 1000 * baseTokenReserves()) / ((fractionalTokenReserves() - outputAmount) * 997);
+        return FixedPointMathLib.mulDivUp(
+            outputAmount * 1000, baseTokenReserves(), (fractionalTokenReserves() - outputAmount) * 997
+        );
     }
 
     /// @notice The amount of base tokens received for selling a given amount of fractional tokens.
