@@ -6,8 +6,8 @@
   "author": "outdoteth <outdoteth@users.noreply.github.com>",
   "license": "MIT",
   "dependencies": {
+    "@openzeppelin/merkle-tree": "^1.0.1",
     "ethers": "^5.7.2",
-    "keccak256": "^1.0.6",
-    "merkletreejs": "^0.3.0"
+    "keccak256": "^1.0.6"
   }
 }
