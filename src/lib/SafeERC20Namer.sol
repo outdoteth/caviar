@@ -26,23 +26,6 @@ library SafeERC20Namer {
         return string(bytesStringTrimmed);
     }
 
-    // assumes the data is in position 2
-    function parseStringData(bytes memory b) private pure returns (string memory) {
-        uint256 charCount = 0;
-        // first parse the charCount out of the data
-        for (uint256 i = 32; i < 64; i++) {
-            charCount <<= 8;
-            charCount += uint8(b[i]);
-        }
-
-        bytes memory bytesStringTrimmed = new bytes(charCount);
-        for (uint256 i = 0; i < charCount; i++) {
-            bytesStringTrimmed[i] = b[i + 64];
-        }
-
-        return string(bytesStringTrimmed);
-    }
-
     // uses a heuristic to produce a token name from the address
     // the heuristic returns the full hex of the address string
     function addressToName(address token) private pure returns (string memory) {
