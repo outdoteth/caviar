@@ -29,7 +29,7 @@ contract Fixture is Test, ERC721TokenReceiver {
         c = new Caviar();
 
         bayc = new MockERC721("yeet", "YEET");
-        usd = new MockERC20("us dollar", "USD");
+        usd = new MockERC20("us dollar", "USD", 6);
 
         p = c.create(address(bayc), address(usd), bytes32(0));
         lpToken = LpToken(p.lpToken());
