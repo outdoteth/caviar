@@ -22,19 +22,19 @@ contract AddBuySellRemoveTest is Fixture {
         deal(address(p), address(this), addFractionalTokenAmount, true);
         uint256 lpTokenAmount = Math.sqrt(addBaseTokenAmount * addFractionalTokenAmount) - 1000;
         usd.approve(address(p), type(uint256).max);
-        p.add(addBaseTokenAmount, addFractionalTokenAmount, lpTokenAmount, 0, type(uint256).max);
+        p.add(addBaseTokenAmount, addFractionalTokenAmount, lpTokenAmount, 0, type(uint256).max, 0);
 
         // buy some amount
         uint256 baseTokenBuyAmount = p.buyQuote(buyTokenAmount);
         deal(address(usd), address(this), baseTokenBuyAmount, true);
-        p.buy(buyTokenAmount, baseTokenBuyAmount);
+        p.buy(buyTokenAmount, baseTokenBuyAmount, 0);
 
         // remove some fraction of liquidity
         uint256 removeLpTokenAmount = lpTokenAmount / 10;
         uint256 expectedBaseTokenAmount = p.baseTokenReserves() * removeLpTokenAmount / lpToken.totalSupply();
         uint256 expectedFractionalTokenAmount =
             p.fractionalTokenReserves() * removeLpTokenAmount / lpToken.totalSupply();
-        (uint256 baseTokenOutputAmount, uint256 fractionalTokenOutputAmount) = p.remove(removeLpTokenAmount, 0, 0);
+        (uint256 baseTokenOutputAmount, uint256 fractionalTokenOutputAmount) = p.remove(removeLpTokenAmount, 0, 0, 0);
 
         assertEq(baseTokenOutputAmount, expectedBaseTokenAmount, "Should have removed correct base token amount");
         assertEq(

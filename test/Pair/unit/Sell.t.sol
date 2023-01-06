@@ -23,7 +23,7 @@ contract SellTest is Fixture {
         usd.approve(address(p), type(uint256).max);
 
         uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) - 1000;
-        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max);
+        p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max, 0);
 
         minOutputAmount =
             (inputAmount * 997 * p.baseTokenReserves()) / ((p.fractionalTokenReserves() * 1000 + inputAmount * 997));
@@ -31,7 +31,7 @@ contract SellTest is Fixture {
 
         deal(address(ethPair), address(this), fractionalTokenAmount, true);
         ethPair.add{value: baseTokenAmount}(
-            baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max
+            baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max, 0
         );
         deal(address(ethPair), address(this), inputAmount, true);
     }
@@ -41,10 +41,20 @@ contract SellTest is Fixture {
         uint256 expectedOutputAmount = minOutputAmount;
 
         // act
-        uint256 outputAmount = p.sell(inputAmount, expectedOutputAmount);
+        uint256 outputAmount = p.sell(inputAmount, expectedOutputAmount, 0);
 
         // assert
         assertEq(outputAmount, expectedOutputAmount, "Should have returned output amount");
+    }
+
+    function testItRevertsIfDeadlinePassed() public {
+        // arrange
+        skip(100);
+        uint256 deadline = block.timestamp - 1;
+
+        // act
+        vm.expectRevert("Expired");
+        p.sell(inputAmount, 0, deadline);
     }
 
     function testItTransfersBaseTokens() public {
@@ -53,7 +63,7 @@ contract SellTest is Fixture {
         uint256 thisBalanceBefore = usd.balanceOf(address(this));
 
         // act
-        p.sell(inputAmount, minOutputAmount);
+        p.sell(inputAmount, minOutputAmount, 0);
 
         // assert
         assertEq(
@@ -72,7 +82,7 @@ contract SellTest is Fixture {
         uint256 thisBalanceBefore = p.balanceOf(address(this));
 
         // act
-        p.sell(inputAmount, minOutputAmount);
+        p.sell(inputAmount, minOutputAmount, 0);
 
         // assert
         assertEq(
@@ -91,7 +101,7 @@ contract SellTest is Fixture {
 
         // act
         vm.expectRevert("Slippage: amount out");
-        p.sell(inputAmount, minOutputAmount);
+        p.sell(inputAmount, minOutputAmount, 0);
     }
 
     function testItTransfersEther() public {
@@ -100,7 +110,7 @@ contract SellTest is Fixture {
         uint256 thisBalanceBefore = address(this).balance;
 
         // act
-        ethPair.sell(inputAmount, minOutputAmount);
+        ethPair.sell(inputAmount, minOutputAmount, 0);
 
         // assert
         assertEq(balanceBefore - address(ethPair).balance, minOutputAmount, "Should have transferred ether from pair");
@@ -111,6 +121,6 @@ contract SellTest is Fixture {
         // act
         vm.expectEmit(true, true, true, true);
         emit Sell(inputAmount, minOutputAmount);
-        p.sell(inputAmount, minOutputAmount);
+        p.sell(inputAmount, minOutputAmount, 0);
     }
 }
