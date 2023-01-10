@@ -479,7 +479,7 @@ contract Pair is ERC20, ERC721TokenReceiver {
     /// @return inputAmount The amount of base tokens required.
     function buyQuote(uint256 outputAmount) public view returns (uint256) {
         return FixedPointMathLib.mulDivUp(
-            outputAmount * 1000, baseTokenReserves(), (fractionalTokenReserves() - outputAmount) * 997
+            outputAmount * 1000, baseTokenReserves(), (fractionalTokenReserves() - outputAmount) * 990
         );
     }
 
@@ -488,7 +488,7 @@ contract Pair is ERC20, ERC721TokenReceiver {
     /// @param inputAmount The amount of fractional tokens to sell.
     /// @return outputAmount The amount of base tokens received.
     function sellQuote(uint256 inputAmount) public view returns (uint256) {
-        uint256 inputAmountWithFee = inputAmount * 997;
+        uint256 inputAmountWithFee = inputAmount * 990;
         return (inputAmountWithFee * baseTokenReserves()) / ((fractionalTokenReserves() * 1000) + inputAmountWithFee);
     }
 

@@ -26,7 +26,7 @@ contract SellTest is Fixture {
         p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max, 0);
 
         minOutputAmount =
-            (inputAmount * 997 * p.baseTokenReserves()) / ((p.fractionalTokenReserves() * 1000 + inputAmount * 997));
+            (inputAmount * 990 * p.baseTokenReserves()) / ((p.fractionalTokenReserves() * 1000 + inputAmount * 990));
         deal(address(p), address(this), inputAmount, true);
 
         deal(address(ethPair), address(this), fractionalTokenAmount, true);

@@ -28,7 +28,7 @@ contract BuyTest is Fixture {
         p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max, 0);
 
         maxInputAmount =
-            (outputAmount * p.baseTokenReserves() * 1000) / ((p.fractionalTokenReserves() - outputAmount) * 997) + 1;
+            (outputAmount * p.baseTokenReserves() * 1000) / ((p.fractionalTokenReserves() - outputAmount) * 990) + 1;
         deal(address(usd), address(this), maxInputAmount, true);
 
         deal(address(ethPair), address(this), fractionalTokenAmount, true);
@@ -164,7 +164,7 @@ contract BuyTest is Fixture {
         uint256 fractionalTokenReserves = 10;
         outputAmount = 9;
 
-        // (9 * 1000 * 10) / ((10 - 9) * 997) = 90.27
+        // (9 * 1000 * 10) / ((10 - 9) * 990) = 90.27
         uint256 expectedInputAmount = 91;
 
         // forgefmt: disable-next-item

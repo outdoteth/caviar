@@ -30,8 +30,8 @@ contract NftSellTest is Fixture {
 
         bayc.setApprovalForAll(address(p), true);
 
-        minOutputAmount = (tokenIds.length * 1e18 * 997 * p.baseTokenReserves())
-            / (p.fractionalTokenReserves() * 1000 + tokenIds.length * 1e18 * 997);
+        minOutputAmount = (tokenIds.length * 1e18 * 990 * p.baseTokenReserves())
+            / (p.fractionalTokenReserves() * 1000 + tokenIds.length * 1e18 * 990);
     }
 
     function testItReturnsOutputAmount() public {
