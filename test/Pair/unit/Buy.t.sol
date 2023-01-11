@@ -5,7 +5,6 @@ import "forge-std/Test.sol";
 import "forge-std/console.sol";
 
 import "../../shared/Fixture.t.sol";
-import "../../../src/Caviar.sol";
 
 contract BuyTest is Fixture {
     using stdStorage for StdStorage;
