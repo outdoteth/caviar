@@ -5,32 +5,35 @@ import "forge-std/Script.sol";
 import "forge-std/console.sol";
 import "ERC721A/ERC721A.sol";
 
-contract FakeWrappedPunks is ERC721A {
-    constructor() ERC721A("Fake Wrapped Cryptopunks", "FWPUNKS") {}
+contract FakeNft is ERC721A {
+    string public baseUri;
+
+    constructor(string memory name, string memory symbol, string memory baseUri_) ERC721A(name, symbol) {
+        baseUri = baseUri_;
+    }
 
     function mint(address to, uint256 quantity) public {
         _mint(to, quantity);
     }
 
-    function tokenURI(uint256 tokenId) public pure override returns (string memory) {
-        return string(abi.encodePacked("https://wrappedpunks.com:3000/api/punks/metadata/", _toString(tokenId)));
+    function tokenURI(uint256 tokenId) public view override returns (string memory) {
+        return string(abi.encodePacked(baseUri, _toString(tokenId)));
     }
 }
 
-contract CreateFakeWrappedPunksScript is Script {
+contract CreateFakeNftScript is Script {
     function setUp() public {}
 
     function run() public {
         vm.startBroadcast();
 
-        FakeWrappedPunks fakeWrappedPunks = new FakeWrappedPunks();
-        console.log("fake wpunks:", address(fakeWrappedPunks));
+        FakeNft fakeNft =
+        new FakeNft(vm.envString("FAKE_NFT_NAME"), vm.envString("FAKE_NFT_SYMBOL"), vm.envString("FAKE_NFT_BASE_URI"));
+        console.log("fake nft:", address(fakeNft));
 
-        fakeWrappedPunks.mint(msg.sender, 250);
-        fakeWrappedPunks.mint(msg.sender, 250);
-        fakeWrappedPunks.mint(msg.sender, 250);
-        fakeWrappedPunks.mint(msg.sender, 250);
-        fakeWrappedPunks.mint(msg.sender, 250);
-        fakeWrappedPunks.mint(msg.sender, 250);
+        fakeNft.mint(msg.sender, 250);
+        fakeNft.mint(msg.sender, 250);
+        fakeNft.mint(msg.sender, 250);
+        fakeNft.mint(msg.sender, 250);
     }
 }
