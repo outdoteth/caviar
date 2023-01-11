@@ -10,3 +10,6 @@
 [submodule "lib/ERC721A"]
 	path = lib/ERC721A
 	url = https://github.com/chiru-labs/ERC721A
+[submodule "lib/royalty-registry-solidity"]
+	path = lib/royalty-registry-solidity
+	url = https://github.com/manifoldxyz/royalty-registry-solidity
