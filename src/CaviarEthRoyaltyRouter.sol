@@ -8,9 +8,13 @@ import "solmate/utils/SafeTransferLib.sol";
 
 import "./Pair.sol";
 
+/// @title CaviarEthRoyaltyRouter
+/// @author out.eth
+/// @notice This contract is used to swap NFTs and pay royalties.
 contract CaviarEthRoyaltyRouter is Owned, ERC721TokenReceiver {
     using SafeTransferLib for address;
 
+    /// @notice The royalty registry from manifold.xyz.
     IRoyaltyRegistry public royaltyRegistry;
 
     constructor(address _royaltyRegistry) Owned(msg.sender) {
@@ -19,10 +23,18 @@ contract CaviarEthRoyaltyRouter is Owned, ERC721TokenReceiver {
 
     receive() external payable {}
 
+    /// @notice Set the royalty registry.
+    /// @param _royaltyRegistry The new royalty registry.
     function setRoyaltyRegistry(address _royaltyRegistry) public onlyOwner {
         royaltyRegistry = IRoyaltyRegistry(_royaltyRegistry);
     }
 
+    /// @notice Make a buy and pay royalties.
+    /// @param pair The pair address.
+    /// @param tokenIds The tokenIds to buy.
+    /// @param maxInputAmount The maximum amount of ETH to spend.
+    /// @param deadline The deadline for the swap.
+    /// @return inputAmount The amount of ETH spent.
     function nftBuy(address pair, uint256[] calldata tokenIds, uint256 maxInputAmount, uint256 deadline)
         public
         payable
@@ -48,6 +60,13 @@ contract CaviarEthRoyaltyRouter is Owned, ERC721TokenReceiver {
         }
     }
 
+    /// @notice Sell NFTs and pay royalties.
+    /// @param pair The pair address.
+    /// @param tokenIds The tokenIds to sell.
+    /// @param minOutputAmount The minimum amount of ETH to receive.
+    /// @param deadline The deadline for the swap.
+    /// @param proofs The proofs for the NFTs.
+    /// @return outputAmount The amount of ETH received.
     function nftSell(
         address pair,
         uint256[] calldata tokenIds,
@@ -76,12 +95,20 @@ contract CaviarEthRoyaltyRouter is Owned, ERC721TokenReceiver {
         msg.sender.safeTransferETH(address(this).balance);
     }
 
+    /// @notice Approves the pair for transfering NFTs from this contract.
+    /// @param tokenAddress The NFT address.
+    /// @param pair The pair address.
     function _approve(address tokenAddress, address pair) internal {
         if (!ERC721(tokenAddress).isApprovedForAll(address(this), pair)) {
             ERC721(tokenAddress).setApprovalForAll(pair, true);
         }
     }
 
+    /// @notice Pay royalties for a list of NFTs at a specified price for each NFT.
+    /// @param tokenAddress The NFT address.
+    /// @param tokenIds The tokenIds to pay royalties for.
+    /// @param salePrice The sale price for each NFT.
+    /// @return totalRoyaltyAmount The total amount of royalties paid.
     function _payRoyalties(address tokenAddress, uint256[] calldata tokenIds, uint256 salePrice)
         internal
         returns (uint256 totalRoyaltyAmount)
@@ -101,6 +128,10 @@ contract CaviarEthRoyaltyRouter is Owned, ERC721TokenReceiver {
         }
     }
 
+    /// @notice Get the royalty for a specific NFT.
+    /// @param lookupAddress The lookup address for the NFT royalty info.
+    /// @param tokenId The tokenId to get the royalty for.
+    /// @param salePrice The sale price for the NFT.
     function _getRoyalty(address lookupAddress, uint256 tokenId, uint256 salePrice)
         internal
         view
