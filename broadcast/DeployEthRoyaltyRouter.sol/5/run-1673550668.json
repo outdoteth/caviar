@@ -22,45 +22,14 @@
       "additionalContracts": []
     }
   ],
-  "receipts": [
-    {
-      "transactionHash": "0x1973a7a623709caf8adf3bc0229a5d9347c8506c021b3219a8325fefb81d06ba",
-      "transactionIndex": "0x9",
-      "blockHash": "0x1fbab4598b0e34683cdcd2babd19713140d4e5852641346d165e063a0b1921d3",
-      "blockNumber": "0x7ea6c0",
-      "from": "0xE70989f0A6b50E3c8Ef6Df57e994E99AA79EbD27",
-      "to": null,
-      "cumulativeGasUsed": "0x201160",
-      "gasUsed": "0xee5f6",
-      "contractAddress": "0xF1D38b49c4Ac7E49725ab6CD236f4984B096A153",
-      "logs": [
-        {
-          "address": "0xF1D38b49c4Ac7E49725ab6CD236f4984B096A153",
-          "topics": [
-            "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0",
-            "0x0000000000000000000000000000000000000000000000000000000000000000",
-            "0x000000000000000000000000e70989f0a6b50e3c8ef6df57e994e99aa79ebd27"
-          ],
-          "data": "0x",
-          "blockHash": "0x1fbab4598b0e34683cdcd2babd19713140d4e5852641346d165e063a0b1921d3",
-          "blockNumber": "0x7ea6c0",
-          "transactionHash": "0x1973a7a623709caf8adf3bc0229a5d9347c8506c021b3219a8325fefb81d06ba",
-          "transactionIndex": "0x9",
-          "logIndex": "0x14",
-          "removed": false
-        }
-      ],
-      "status": "0x1",
-      "logsBloom": "0x00000000000000000000000000000000000000000000000000900000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000020000000000000000000800000000000000000000000000000000400000000000000000000000000000000000000100000000000000000000000000000000000080000000000000000000000080000000000000000001000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000200000000000000000000000000000000000000000",
-      "type": "0x2",
-      "effectiveGasPrice": "0x3af596e6f"
-    }
-  ],
+  "receipts": [],
   "libraries": [],
-  "pending": [],
+  "pending": [
+    "0x1973a7a623709caf8adf3bc0229a5d9347c8506c021b3219a8325fefb81d06ba"
+  ],
   "path": "/Users/out/caviar/broadcast/DeployEthRoyaltyRouter.sol/5/run-latest.json",
   "returns": {},
-  "timestamp": 1673550696,
+  "timestamp": 1673550668,
   "chain": 5,
   "multi": false,
   "commit": "72e6e0b"

@@ -95,6 +95,14 @@ contract CaviarEthRoyaltyRouter is Owned, ERC721TokenReceiver {
         msg.sender.safeTransferETH(address(this).balance);
     }
 
+    /// @notice Get the royalty rate with 18 decimals of precision for a specific NFT collection.
+    /// @param tokenAddress The NFT address.
+    function getRoyaltyRate(address tokenAddress) public view returns (uint256) {
+        address lookupAddress = royaltyRegistry.getRoyaltyLookupAddress(tokenAddress);
+        (, uint256 royaltyAmount) = _getRoyalty(lookupAddress, 10, 1e18);
+        return royaltyAmount;
+    }
+
     /// @notice Approves the pair for transfering NFTs from this contract.
     /// @param tokenAddress The NFT address.
     /// @param pair The pair address.
@@ -120,7 +128,7 @@ contract CaviarEthRoyaltyRouter is Owned, ERC721TokenReceiver {
         for (uint256 i = 0; i < tokenIds.length; i++) {
             (address _recipient, uint256 royaltyAmount) = _getRoyalty(lookupAddress, tokenIds[i], salePrice);
             totalRoyaltyAmount += royaltyAmount;
-            recipient = _recipient;
+            recipient = _recipient; // assume that royalty recipient is the same for all NFTs
         }
 
         if (totalRoyaltyAmount > 0 && recipient != address(0)) {
