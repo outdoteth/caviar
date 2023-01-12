@@ -39,19 +39,19 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "uint256",
         "name": "baseTokenAmount",
         "type": "uint256"
       },
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "uint256",
         "name": "fractionalTokenAmount",
         "type": "uint256"
       },
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "uint256",
         "name": "lpTokenAmount",
         "type": "uint256"
@@ -89,13 +89,13 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "uint256",
         "name": "inputAmount",
         "type": "uint256"
       },
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "uint256",
         "name": "outputAmount",
         "type": "uint256"
@@ -108,7 +108,7 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "uint256",
         "name": "closeTimestamp",
         "type": "uint256"
@@ -121,19 +121,19 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "uint256",
         "name": "baseTokenAmount",
         "type": "uint256"
       },
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "uint256",
         "name": "fractionalTokenAmount",
         "type": "uint256"
       },
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "uint256",
         "name": "lpTokenAmount",
         "type": "uint256"
@@ -146,13 +146,13 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "uint256",
         "name": "inputAmount",
         "type": "uint256"
       },
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "uint256",
         "name": "outputAmount",
         "type": "uint256"
@@ -190,7 +190,7 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "uint256[]",
         "name": "tokenIds",
         "type": "uint256[]"
@@ -203,7 +203,7 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "uint256",
         "name": "tokenId",
         "type": "uint256"
@@ -216,7 +216,7 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "uint256[]",
         "name": "tokenIds",
         "type": "uint256[]"
@@ -252,19 +252,6 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "ONE",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -279,6 +266,21 @@
       {
         "internalType": "uint256",
         "name": "minLpTokenAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "minPrice",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "maxPrice",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "deadline",
         "type": "uint256"
       }
     ],
@@ -303,6 +305,11 @@
       {
         "internalType": "uint256",
         "name": "fractionalTokenAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "lpTokenSupply",
         "type": "uint256"
       }
     ],
@@ -420,6 +427,11 @@
       {
         "internalType": "uint256",
         "name": "maxInputAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "deadline",
         "type": "uint256"
       }
     ],
@@ -582,6 +594,21 @@
         "type": "uint256"
       },
       {
+        "internalType": "uint256",
+        "name": "minPrice",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "maxPrice",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "deadline",
+        "type": "uint256"
+      },
+      {
         "internalType": "bytes32[][]",
         "name": "proofs",
         "type": "bytes32[][]"
@@ -609,6 +636,11 @@
         "internalType": "uint256",
         "name": "maxInputAmount",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "deadline",
+        "type": "uint256"
       }
     ],
     "name": "nftBuy",
@@ -632,6 +664,11 @@
       {
         "internalType": "uint256",
         "name": "minBaseTokenOutputAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "deadline",
         "type": "uint256"
       },
       {
@@ -671,6 +708,11 @@
       {
         "internalType": "uint256",
         "name": "minOutputAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "deadline",
         "type": "uint256"
       },
       {
@@ -815,6 +857,11 @@
         "internalType": "uint256",
         "name": "minFractionalTokenOutputAmount",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "deadline",
+        "type": "uint256"
       }
     ],
     "name": "remove",
@@ -867,6 +914,11 @@
       {
         "internalType": "uint256",
         "name": "minOutputAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "deadline",
         "type": "uint256"
       }
     ],
