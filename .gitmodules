@@ -13,3 +13,6 @@
 [submodule "lib/royalty-registry-solidity"]
 	path = lib/royalty-registry-solidity
 	url = https://github.com/manifoldxyz/royalty-registry-solidity
+[submodule "lib/oracle"]
+	path = lib/oracle
+	url = https://github.com/reservoirprotocol/oracle
