@@ -5,6 +5,7 @@ import "solmate/auth/Owned.sol";
 import {IRoyaltyRegistry} from "royalty-registry-solidity/IRoyaltyRegistry.sol";
 import "openzeppelin/interfaces/IERC2981.sol";
 import "solmate/utils/SafeTransferLib.sol";
+import "reservoir-oracle/ReservoirOracle.sol";
 
 import "./Pair.sol";
 
@@ -72,7 +73,8 @@ contract CaviarEthRoyaltyRouter is Owned, ERC721TokenReceiver {
         uint256[] calldata tokenIds,
         uint256 minOutputAmount,
         uint256 deadline,
-        bytes32[][] calldata proofs
+        bytes32[][] calldata proofs,
+        ReservoirOracle.Message[] calldata messages
     ) public returns (uint256 outputAmount) {
         // transfer the NFTs to this contract
         address nft = Pair(pair).nft();
@@ -84,7 +86,7 @@ contract CaviarEthRoyaltyRouter is Owned, ERC721TokenReceiver {
         _approve(address(nft), pair);
 
         // make the swap
-        outputAmount = Pair(pair).nftSell(tokenIds, minOutputAmount, deadline, proofs);
+        outputAmount = Pair(pair).nftSell(tokenIds, minOutputAmount, deadline, proofs, messages);
 
         // payout the royalties
         uint256 salePrice = outputAmount / tokenIds.length;

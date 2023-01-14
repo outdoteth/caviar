@@ -3,6 +3,7 @@ pragma solidity ^0.8.17;
 
 import "forge-std/Test.sol";
 import "forge-std/console.sol";
+import "reservoir-oracle/ReservoirOracle.sol";
 
 import "../../shared/Fixture.t.sol";
 import "../../../src/Caviar.sol";
@@ -12,6 +13,7 @@ contract NftRemoveTest is Fixture {
     uint256 public totalLpTokenAmount;
     uint256[] public tokenIds;
     bytes32[][] public proofs;
+    ReservoirOracle.Message[] public messages;
 
     function setUp() public {
         deal(address(usd), address(this), totalBaseTokenAmount, true);
@@ -24,7 +26,8 @@ contract NftRemoveTest is Fixture {
         usd.approve(address(p), type(uint256).max);
 
         uint256 minLpTokenAmount = Math.sqrt(totalBaseTokenAmount * tokenIds.length * 1e18) - 1000;
-        totalLpTokenAmount = p.nftAdd(totalBaseTokenAmount, tokenIds, minLpTokenAmount, 0, 0, type(uint256).max, proofs);
+        totalLpTokenAmount =
+            p.nftAdd(totalBaseTokenAmount, tokenIds, minLpTokenAmount, 0, 0, type(uint256).max, proofs, messages);
 
         tokenIds.pop();
         tokenIds.pop();

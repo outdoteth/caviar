@@ -15,10 +15,23 @@ contract Caviar is Owned {
     /// @dev pairs[nft][baseToken][merkleRoot] -> pair
     mapping(address => mapping(address => mapping(bytes32 => address))) public pairs;
 
+    /// @dev Whether to use the reservoir filter oracle for stolen NFTs.
+    bool public useReservoirFilterOracle;
+
+    event SetUseReservoirFilterOracle(bool indexed useReservoirFilterOracle);
     event Create(address indexed nft, address indexed baseToken, bytes32 indexed merkleRoot);
     event Destroy(address indexed nft, address indexed baseToken, bytes32 indexed merkleRoot);
 
-    constructor() Owned(msg.sender) {}
+    constructor() Owned(msg.sender) {
+        useReservoirFilterOracle = true;
+    }
+
+    /// @notice Set whether to use the reservoir filter oracle for stolen NFTs.
+    /// @param _useReservoirFilterOracle Whether to use the reservoir filter oracle.
+    function setUseReservoirFilterOracle(bool _useReservoirFilterOracle) public onlyOwner {
+        useReservoirFilterOracle = _useReservoirFilterOracle;
+        emit SetUseReservoirFilterOracle(_useReservoirFilterOracle);
+    }
 
     /// @notice Creates a new pair.
     /// @param nft The NFT contract address.

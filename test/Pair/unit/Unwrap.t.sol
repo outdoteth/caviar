@@ -6,12 +6,14 @@ import "forge-std/console.sol";
 
 import "../../shared/Fixture.t.sol";
 import "../../../src/Caviar.sol";
+import "reservoir-oracle/ReservoirOracle.sol";
 
 contract UnwrapTest is Fixture {
     event Unwrap(uint256[] indexed tokenIds);
 
     uint256[] public tokenIds;
     bytes32[][] public proofs;
+    ReservoirOracle.Message[] public messages;
 
     function setUp() public {
         bayc.setApprovalForAll(address(p), true);
@@ -21,7 +23,7 @@ contract UnwrapTest is Fixture {
             tokenIds.push(i);
         }
 
-        p.wrap(tokenIds, proofs);
+        p.wrap(tokenIds, proofs, messages);
     }
 
     function testItTransfersTokens() public {

@@ -3,6 +3,7 @@ pragma solidity ^0.8.17;
 
 import "forge-std/Test.sol";
 import "forge-std/console.sol";
+import "reservoir-oracle/ReservoirOracle.sol";
 
 import "../../shared/Fixture.t.sol";
 import "../../../src/Caviar.sol";
@@ -11,6 +12,7 @@ contract NftAddTest is Fixture {
     uint256 public baseTokenAmount = 100 * 1e18;
     uint256[] public tokenIds;
     bytes32[][] public proofs;
+    ReservoirOracle.Message[] public messages;
 
     function setUp() public {
         deal(address(usd), address(this), baseTokenAmount, true);
@@ -32,7 +34,8 @@ contract NftAddTest is Fixture {
         c.transferOwnership(owner);
 
         // act
-        uint256 lpTokenAmount = p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, 0, 0, type(uint256).max, proofs);
+        uint256 lpTokenAmount =
+            p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, 0, 0, type(uint256).max, proofs, messages);
 
         // assert
         assertEq(lpTokenAmount, expectedLpTokenAmount, "Should have returned correct lp token amount");
@@ -47,7 +50,7 @@ contract NftAddTest is Fixture {
         uint256 balanceBefore = usd.balanceOf(address(this));
 
         // act
-        p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, 0, 0, type(uint256).max, proofs);
+        p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, 0, 0, type(uint256).max, proofs, messages);
 
         // assert
         uint256 balanceAfter = usd.balanceOf(address(this));
@@ -60,7 +63,7 @@ contract NftAddTest is Fixture {
         uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * tokenIds.length * 1e18) - 1000;
 
         // act
-        p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, 0, 0, type(uint256).max, proofs);
+        p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, 0, 0, type(uint256).max, proofs, messages);
 
         // assert
         for (uint256 i = 0; i < tokenIds.length; i++) {
@@ -74,7 +77,7 @@ contract NftAddTest is Fixture {
 
         // act
         vm.expectRevert("Slippage: lp token amount out");
-        p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, 0, 0, type(uint256).max, proofs);
+        p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, 0, 0, type(uint256).max, proofs, messages);
     }
 
     function testItMintsLpTokensAfterInit() public {
@@ -101,7 +104,8 @@ contract NftAddTest is Fixture {
         }
 
         // act
-        uint256 lpTokenAmount = p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, 0, type(uint256).max, 0, proofs);
+        uint256 lpTokenAmount =
+            p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, 0, type(uint256).max, 0, proofs, messages);
         vm.stopPrank();
 
         // assert
@@ -122,7 +126,7 @@ contract NftAddTest is Fixture {
 
         // act
         vm.expectRevert("Slippage: lp token amount out");
-        p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, 0, type(uint256).max, 0, proofs);
+        p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, 0, type(uint256).max, 0, proofs, messages);
     }
 
     function testItAddsWithMerkleProof() public {
@@ -134,7 +138,7 @@ contract NftAddTest is Fixture {
         usd.approve(address(pair), type(uint256).max);
 
         // act
-        pair.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, 0, 0, type(uint256).max, proofs);
+        pair.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, 0, 0, type(uint256).max, proofs, messages);
 
         // assert
         for (uint256 i = 0; i < tokenIds.length; i++) {
@@ -150,6 +154,6 @@ contract NftAddTest is Fixture {
 
         // act
         vm.expectRevert("Expired");
-        p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, 0, 0, deadline, proofs);
+        p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, 0, 0, deadline, proofs, messages);
     }
 }

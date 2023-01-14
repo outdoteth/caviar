@@ -7,6 +7,7 @@ import "solmate/utils/MerkleProofLib.sol";
 import "solmate/utils/SafeTransferLib.sol";
 import "solmate/utils/FixedPointMathLib.sol";
 import "openzeppelin/utils/math/Math.sol";
+import "reservoir-oracle/ReservoirOracle.sol";
 
 import "./LpToken.sol";
 import "./Caviar.sol";
@@ -14,7 +15,7 @@ import "./Caviar.sol";
 /// @title Pair
 /// @author out.eth (@outdoteth)
 /// @notice A pair of an NFT and a base token that can be used to create and trade fractionalized NFTs.
-contract Pair is ERC20, ERC721TokenReceiver {
+contract Pair is ERC20, ERC721TokenReceiver, ReservoirOracle {
     using SafeTransferLib for address;
     using SafeTransferLib for ERC20;
 
@@ -45,7 +46,10 @@ contract Pair is ERC20, ERC721TokenReceiver {
         string memory pairSymbol,
         string memory nftName,
         string memory nftSymbol
-    ) ERC20(string.concat(nftName, " fractional token"), string.concat("f", nftSymbol), 18) {
+    )
+        ERC20(string.concat(nftName, " fractional token"), string.concat("f", nftSymbol), 18)
+        ReservoirOracle(0x32dA57E736E05f75aa4FaE2E9Be60FD904492726)
+    {
         nft = _nft;
         baseToken = _baseToken; // use address(0) for native ETH
         merkleRoot = _merkleRoot;
@@ -259,7 +263,7 @@ contract Pair is ERC20, ERC721TokenReceiver {
     /// @param tokenIds The ids of the NFTs to wrap.
     /// @param proofs The merkle proofs for the NFTs proving that they can be used in the pair.
     /// @return fractionalTokenAmount The amount of fractional tokens minted.
-    function wrap(uint256[] calldata tokenIds, bytes32[][] calldata proofs)
+    function wrap(uint256[] calldata tokenIds, bytes32[][] calldata proofs, Message[] calldata messages)
         public
         returns (uint256 fractionalTokenAmount)
     {
@@ -270,6 +274,9 @@ contract Pair is ERC20, ERC721TokenReceiver {
 
         // check the tokens exist in the merkle root
         _validateTokenIds(tokenIds, proofs);
+
+        // check that the tokens are not stolen with reservoir oracle
+        _validateTokensAreNotStolen(tokenIds, messages);
 
         // *** Effects *** //
 
@@ -344,10 +351,11 @@ contract Pair is ERC20, ERC721TokenReceiver {
         uint256 minPrice,
         uint256 maxPrice,
         uint256 deadline,
-        bytes32[][] calldata proofs
+        bytes32[][] calldata proofs,
+        Message[] calldata messages
     ) public payable returns (uint256 lpTokenAmount) {
         // wrap the incoming NFTs into fractional tokens
-        uint256 fractionalTokenAmount = wrap(tokenIds, proofs);
+        uint256 fractionalTokenAmount = wrap(tokenIds, proofs, messages);
 
         // add liquidity using the fractional tokens and base tokens
         lpTokenAmount = add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, minPrice, maxPrice, deadline);
@@ -403,10 +411,11 @@ contract Pair is ERC20, ERC721TokenReceiver {
         uint256[] calldata tokenIds,
         uint256 minOutputAmount,
         uint256 deadline,
-        bytes32[][] calldata proofs
+        bytes32[][] calldata proofs,
+        Message[] calldata messages
     ) public returns (uint256 outputAmount) {
         // wrap the incoming NFTs into fractional tokens
-        uint256 inputAmount = wrap(tokenIds, proofs);
+        uint256 inputAmount = wrap(tokenIds, proofs, messages);
 
         // sell fractional tokens for base tokens
         outputAmount = sell(inputAmount, minOutputAmount, deadline);
@@ -543,6 +552,28 @@ contract Pair is ERC20, ERC721TokenReceiver {
         emit Transfer(from, to, amount);
 
         return true;
+    }
+
+    function _validateTokensAreNotStolen(uint256[] calldata tokenIds, Message[] calldata messages) internal view {
+        if (!caviar.useReservoirFilterOracle()) return;
+
+        address _nft = nft; // cache storage read
+        for (uint256 i = 0; i < tokenIds.length; i++) {
+            Message calldata message = messages[i];
+
+            // check that the signer is correct
+            uint256 validFor = 60 minutes;
+            require(_verifyMessage(message.id, validFor, message), "Message has invalid signature");
+
+            (bool isFlagged, uint256 lastTransferTime, uint256 tokenId, address tokenAddress) =
+                abi.decode(message.payload, (bool, uint256, uint256, address));
+
+            // check that the NFT is not stolen
+            require(!isFlagged, "NFT is flagged as suspicious");
+
+            // check that the message matches the associated token id and nft address
+            require(tokenId == tokenIds[i] && tokenAddress == _nft, "Invalid token proof params");
+        }
     }
 
     /// @dev Validates that the given tokenIds are valid for the contract's merkle root. Reverts

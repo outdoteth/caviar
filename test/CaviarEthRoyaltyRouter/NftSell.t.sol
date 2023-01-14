@@ -3,6 +3,7 @@ pragma solidity ^0.8.17;
 
 import "forge-std/Test.sol";
 import "forge-std/console.sol";
+import "reservoir-oracle/ReservoirOracle.sol";
 
 import "../shared/Fixture.t.sol";
 
@@ -10,6 +11,7 @@ contract NftSellCaviarEthRoyaltyTest is Fixture {
     uint256 public minOutputAmount;
     uint256[] public tokenIds;
     bytes32[][] public proofs;
+    ReservoirOracle.Message[] public messages;
 
     function setUp() public {
         uint256 baseTokenAmount = 69.69e18;
@@ -40,7 +42,7 @@ contract NftSellCaviarEthRoyaltyTest is Fixture {
         uint256 expectedOutputAmount = minOutputAmount - royalty;
 
         // act
-        uint256 outputAmount = router.nftSell(address(ethPair), tokenIds, expectedOutputAmount, 0, proofs);
+        uint256 outputAmount = router.nftSell(address(ethPair), tokenIds, expectedOutputAmount, 0, proofs, messages);
 
         // assert
         assertApproxEqAbs(outputAmount, expectedOutputAmount, 20, "Should have returned output amount");
@@ -53,7 +55,7 @@ contract NftSellCaviarEthRoyaltyTest is Fixture {
         uint256 balanceBefore = address(this).balance;
 
         // act
-        router.nftSell(address(ethPair), tokenIds, minOutputAmount, 0, proofs);
+        router.nftSell(address(ethPair), tokenIds, minOutputAmount, 0, proofs, messages);
 
         // assert
         assertApproxEqAbs(address(this).balance - balanceBefore, expectedOutputAmount, 20, "Should have returned eth");
@@ -64,7 +66,7 @@ contract NftSellCaviarEthRoyaltyTest is Fixture {
         uint256 royalty = minOutputAmount / 10;
 
         // act
-        router.nftSell(address(ethPair), tokenIds, minOutputAmount, 0, proofs);
+        router.nftSell(address(ethPair), tokenIds, minOutputAmount, 0, proofs, messages);
 
         // assert
         assertApproxEqAbs(address(0xbeefbeef).balance, royalty, 20, "Should have sent eth to royalty recipient");

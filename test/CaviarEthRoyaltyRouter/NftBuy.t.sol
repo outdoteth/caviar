@@ -3,6 +3,7 @@ pragma solidity ^0.8.17;
 
 import "forge-std/Test.sol";
 import "forge-std/console.sol";
+import "reservoir-oracle/ReservoirOracle.sol";
 
 import "../shared/Fixture.t.sol";
 
@@ -11,6 +12,7 @@ contract NftBuyCaviarEthRoyaltyTest is Fixture {
     uint256 public maxInputAmount;
     uint256[] public tokenIds;
     bytes32[][] public proofs;
+    ReservoirOracle.Message[] public messages;
 
     function setUp() public {
         for (uint256 i = 0; i < 5; i++) {
@@ -24,7 +26,7 @@ contract NftBuyCaviarEthRoyaltyTest is Fixture {
         uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * tokenIds.length * 1e18) - 1000;
         deal(address(this), baseTokenAmount);
         ethPair.nftAdd{value: baseTokenAmount}(
-            baseTokenAmount, tokenIds, minLpTokenAmount, 0, 0, type(uint256).max, proofs
+            baseTokenAmount, tokenIds, minLpTokenAmount, 0, 0, type(uint256).max, proofs, messages
         );
 
         tokenIds.pop();
@@ -66,7 +68,7 @@ contract NftBuyCaviarEthRoyaltyTest is Fixture {
         uint256 expectedBalance = address(this).balance - (maxInputAmount + royaltyAmount);
 
         // act
-        router.nftBuy{value: maxInputAmount + royaltyAmount}(address(ethPair), tokenIds, maxInputAmount, 0);
+        router.nftBuy{value: maxInputAmount + royaltyAmount + surplus}(address(ethPair), tokenIds, maxInputAmount, 0);
 
         // assert
         assertApproxEqAbs(address(this).balance, expectedBalance, 100, "Should have refunded surplus eth");

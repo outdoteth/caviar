@@ -6,12 +6,14 @@ import "forge-std/console.sol";
 
 import "../../shared/Fixture.t.sol";
 import "../../../src/Caviar.sol";
+import "reservoir-oracle/ReservoirOracle.sol";
 
 contract WrapTest is Fixture {
     event Wrap(uint256[] indexed tokenIds);
 
     uint256[] public tokenIds;
     bytes32[][] public proofs;
+    ReservoirOracle.Message[] public messages;
 
     function setUp() public {
         bayc.setApprovalForAll(address(p), true);
@@ -24,7 +26,7 @@ contract WrapTest is Fixture {
 
     function testItTransfersTokens() public {
         // act
-        p.wrap(tokenIds, proofs);
+        p.wrap(tokenIds, proofs, messages);
 
         // assert
         for (uint256 i = 0; i < tokenIds.length; i++) {
@@ -37,7 +39,7 @@ contract WrapTest is Fixture {
         uint256 expectedFractionalTokens = tokenIds.length * 1e18;
 
         // act
-        p.wrap(tokenIds, proofs);
+        p.wrap(tokenIds, proofs, messages);
 
         // assert
         assertEq(p.balanceOf(address(this)), expectedFractionalTokens, "Should have minted fractional tokens to sender");
@@ -48,7 +50,7 @@ contract WrapTest is Fixture {
         // act
         vm.expectEmit(true, true, true, true);
         emit Wrap(tokenIds);
-        p.wrap(tokenIds, proofs);
+        p.wrap(tokenIds, proofs, messages);
     }
 
     function testItAddsWithMerkleProof() public {
@@ -58,7 +60,7 @@ contract WrapTest is Fixture {
         bayc.setApprovalForAll(address(pair), true);
 
         // act
-        pair.wrap(tokenIds, proofs);
+        pair.wrap(tokenIds, proofs, messages);
 
         // assert
         for (uint256 i = 0; i < tokenIds.length; i++) {

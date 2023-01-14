@@ -3,6 +3,7 @@ pragma solidity ^0.8.17;
 
 import "forge-std/Test.sol";
 import "forge-std/console.sol";
+import "reservoir-oracle/ReservoirOracle.sol";
 
 import "../../shared/Fixture.t.sol";
 import "../../../src/Caviar.sol";
@@ -11,6 +12,7 @@ contract NftSellTest is Fixture {
     uint256 public minOutputAmount;
     uint256[] public tokenIds;
     bytes32[][] public proofs;
+    ReservoirOracle.Message[] public messages;
 
     function setUp() public {
         uint256 baseTokenAmount = 69.69e18;
@@ -39,7 +41,7 @@ contract NftSellTest is Fixture {
         uint256 expectedOutputAmount = minOutputAmount;
 
         // act
-        uint256 outputAmount = p.nftSell(tokenIds, expectedOutputAmount, 0, proofs);
+        uint256 outputAmount = p.nftSell(tokenIds, expectedOutputAmount, 0, proofs, messages);
 
         // assert
         assertEq(outputAmount, expectedOutputAmount, "Should have returned output amount");
@@ -51,7 +53,7 @@ contract NftSellTest is Fixture {
         uint256 thisBalanceBefore = usd.balanceOf(address(this));
 
         // act
-        p.nftSell(tokenIds, minOutputAmount, 0, proofs);
+        p.nftSell(tokenIds, minOutputAmount, 0, proofs, messages);
 
         // assert
         assertEq(
@@ -67,7 +69,7 @@ contract NftSellTest is Fixture {
 
     function testItTransfersNfts() public {
         // act
-        p.nftSell(tokenIds, minOutputAmount, 0, proofs);
+        p.nftSell(tokenIds, minOutputAmount, 0, proofs, messages);
 
         // assert
         for (uint256 i = 0; i < tokenIds.length; i++) {
@@ -81,7 +83,7 @@ contract NftSellTest is Fixture {
 
         // act
         vm.expectRevert("Slippage: amount out");
-        p.nftSell(tokenIds, minOutputAmount, 0, proofs);
+        p.nftSell(tokenIds, minOutputAmount, 0, proofs, messages);
     }
 
     function testItRevertsIfDeadlinePassed() public {
@@ -91,7 +93,7 @@ contract NftSellTest is Fixture {
 
         // act
         vm.expectRevert("Expired");
-        p.nftSell(tokenIds, minOutputAmount, deadline, proofs);
+        p.nftSell(tokenIds, minOutputAmount, deadline, proofs, messages);
     }
 
     function testItMintsFractionalTokens() public {
@@ -100,7 +102,7 @@ contract NftSellTest is Fixture {
         uint256 balanceBefore = p.balanceOf(address(p));
 
         // act
-        p.nftSell(tokenIds, minOutputAmount, 0, proofs);
+        p.nftSell(tokenIds, minOutputAmount, 0, proofs, messages);
 
         // assert
         assertEq(p.totalSupply() - totalSupplyBefore, tokenIds.length * 1e18, "Should have minted fractional tokens");
@@ -128,7 +130,7 @@ contract NftSellTest is Fixture {
         bayc.setApprovalForAll(address(pair), true);
 
         // act
-        pair.nftSell(tokenIds, minOutputAmount, 0, proofs);
+        pair.nftSell(tokenIds, minOutputAmount, 0, proofs, messages);
 
         // assert
         for (uint256 i = 0; i < tokenIds.length; i++) {

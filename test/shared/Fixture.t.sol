@@ -4,6 +4,7 @@ pragma solidity ^0.8.17;
 import "forge-std/Test.sol";
 import "solmate/tokens/ERC721.sol";
 import {RoyaltyRegistry} from "royalty-registry-solidity/RoyaltyRegistry.sol";
+import "reservoir-oracle/ReservoirOracle.sol";
 
 import "../../src/Caviar.sol";
 import "../../src/Pair.sol";
@@ -31,6 +32,7 @@ contract Fixture is Test, ERC721TokenReceiver {
         createPairScript = new CreatePairScript();
 
         c = new Caviar();
+        c.setUseReservoirFilterOracle(false);
 
         bayc = new MockERC721WithRoyalty("yeet", "YEET");
         usd = new MockERC20("us dollar", "USD", 6);
