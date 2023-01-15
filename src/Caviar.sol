@@ -15,22 +15,22 @@ contract Caviar is Owned {
     /// @dev pairs[nft][baseToken][merkleRoot] -> pair
     mapping(address => mapping(address => mapping(bytes32 => address))) public pairs;
 
-    /// @dev Whether to use the reservoir filter oracle for stolen NFTs.
-    bool public useReservoirFilterOracle;
+    /// @dev The stolen nft filter oracle address
+    address public stolenNftFilterOracle;
 
-    event SetUseReservoirFilterOracle(bool indexed useReservoirFilterOracle);
+    event SetStolenNftFilterOracle(address indexed stolenNftFilterOracle);
     event Create(address indexed nft, address indexed baseToken, bytes32 indexed merkleRoot);
     event Destroy(address indexed nft, address indexed baseToken, bytes32 indexed merkleRoot);
 
-    constructor() Owned(msg.sender) {
-        useReservoirFilterOracle = true;
+    constructor(address _stolenNftFilterOracle) Owned(msg.sender) {
+        stolenNftFilterOracle = _stolenNftFilterOracle;
     }
 
-    /// @notice Set whether to use the reservoir filter oracle for stolen NFTs.
-    /// @param _useReservoirFilterOracle Whether to use the reservoir filter oracle.
-    function setUseReservoirFilterOracle(bool _useReservoirFilterOracle) public onlyOwner {
-        useReservoirFilterOracle = _useReservoirFilterOracle;
-        emit SetUseReservoirFilterOracle(_useReservoirFilterOracle);
+    /// @notice Sets the stolen nft filter oracle address.
+    /// @param _stolenNftFilterOracle The stolen nft filter oracle address.
+    function setStolenNftFilterOracle(address _stolenNftFilterOracle) public onlyOwner {
+        stolenNftFilterOracle = _stolenNftFilterOracle;
+        emit SetStolenNftFilterOracle(_stolenNftFilterOracle);
     }
 
     /// @notice Creates a new pair.

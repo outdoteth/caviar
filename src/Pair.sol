@@ -11,11 +11,12 @@ import "reservoir-oracle/ReservoirOracle.sol";
 
 import "./LpToken.sol";
 import "./Caviar.sol";
+import "./StolenNftFilterOracle.sol";
 
 /// @title Pair
 /// @author out.eth (@outdoteth)
 /// @notice A pair of an NFT and a base token that can be used to create and trade fractionalized NFTs.
-contract Pair is ERC20, ERC721TokenReceiver, ReservoirOracle {
+contract Pair is ERC20, ERC721TokenReceiver {
     using SafeTransferLib for address;
     using SafeTransferLib for ERC20;
 
@@ -46,10 +47,7 @@ contract Pair is ERC20, ERC721TokenReceiver, ReservoirOracle {
         string memory pairSymbol,
         string memory nftName,
         string memory nftSymbol
-    )
-        ERC20(string.concat(nftName, " fractional token"), string.concat("f", nftSymbol), 18)
-        ReservoirOracle(0x32dA57E736E05f75aa4FaE2E9Be60FD904492726)
-    {
+    ) ERC20(string.concat(nftName, " fractional token"), string.concat("f", nftSymbol), 18) {
         nft = _nft;
         baseToken = _baseToken; // use address(0) for native ETH
         merkleRoot = _merkleRoot;
@@ -263,7 +261,7 @@ contract Pair is ERC20, ERC721TokenReceiver, ReservoirOracle {
     /// @param tokenIds The ids of the NFTs to wrap.
     /// @param proofs The merkle proofs for the NFTs proving that they can be used in the pair.
     /// @return fractionalTokenAmount The amount of fractional tokens minted.
-    function wrap(uint256[] calldata tokenIds, bytes32[][] calldata proofs, Message[] calldata messages)
+    function wrap(uint256[] calldata tokenIds, bytes32[][] calldata proofs, ReservoirOracle.Message[] calldata messages)
         public
         returns (uint256 fractionalTokenAmount)
     {
@@ -352,7 +350,7 @@ contract Pair is ERC20, ERC721TokenReceiver, ReservoirOracle {
         uint256 maxPrice,
         uint256 deadline,
         bytes32[][] calldata proofs,
-        Message[] calldata messages
+        ReservoirOracle.Message[] calldata messages
     ) public payable returns (uint256 lpTokenAmount) {
         // wrap the incoming NFTs into fractional tokens
         uint256 fractionalTokenAmount = wrap(tokenIds, proofs, messages);
@@ -412,7 +410,7 @@ contract Pair is ERC20, ERC721TokenReceiver, ReservoirOracle {
         uint256 minOutputAmount,
         uint256 deadline,
         bytes32[][] calldata proofs,
-        Message[] calldata messages
+        ReservoirOracle.Message[] calldata messages
     ) public returns (uint256 outputAmount) {
         // wrap the incoming NFTs into fractional tokens
         uint256 inputAmount = wrap(tokenIds, proofs, messages);
@@ -554,26 +552,17 @@ contract Pair is ERC20, ERC721TokenReceiver, ReservoirOracle {
         return true;
     }
 
-    function _validateTokensAreNotStolen(uint256[] calldata tokenIds, Message[] calldata messages) internal view {
-        if (!caviar.useReservoirFilterOracle()) return;
+    function _validateTokensAreNotStolen(uint256[] calldata tokenIds, ReservoirOracle.Message[] calldata messages)
+        internal
+        view
+    {
+        address stolenNftFilterAddress = caviar.stolenNftFilterOracle();
 
-        address _nft = nft; // cache storage read
-        for (uint256 i = 0; i < tokenIds.length; i++) {
-            Message calldata message = messages[i];
+        // if filter address is not set then no need to check if nfts are stolen
+        if (stolenNftFilterAddress == address(0)) return;
 
-            // check that the signer is correct
-            uint256 validFor = 60 minutes;
-            require(_verifyMessage(message.id, validFor, message), "Message has invalid signature");
-
-            (bool isFlagged, uint256 lastTransferTime, uint256 tokenId, address tokenAddress) =
-                abi.decode(message.payload, (bool, uint256, uint256, address));
-
-            // check that the NFT is not stolen
-            require(!isFlagged, "NFT is flagged as suspicious");
-
-            // check that the message matches the associated token id and nft address
-            require(tokenId == tokenIds[i] && tokenAddress == _nft, "Invalid token proof params");
-        }
+        // validate that nfts are not stolen
+        StolenNftFilterOracle(stolenNftFilterAddress).validateTokensAreNotStolen(nft, tokenIds, messages);
     }
 
     /// @dev Validates that the given tokenIds are valid for the contract's merkle root. Reverts

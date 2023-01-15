@@ -5,6 +5,7 @@ import "forge-std/Script.sol";
 import "forge-std/console.sol";
 
 import "../src/Caviar.sol";
+import "../src/StolenNftFilterOracle.sol";
 
 contract DeployScript is Script {
     using stdJson for string;
@@ -14,7 +15,8 @@ contract DeployScript is Script {
     function run() public {
         vm.startBroadcast();
 
-        Caviar c = new Caviar();
+        StolenNftFilterOracle s = new StolenNftFilterOracle();
+        Caviar c = new Caviar(address(s));
 
         console.log("caviar:", address(c));
     }

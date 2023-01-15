@@ -9,6 +9,7 @@ import "reservoir-oracle/ReservoirOracle.sol";
 import "../../src/Caviar.sol";
 import "../../src/Pair.sol";
 import "../../src/CaviarEthRoyaltyRouter.sol";
+import "../../src/StolenNftFilterOracle.sol";
 import "./mocks/MockERC721.sol";
 import "./mocks/MockERC20.sol";
 import "./mocks/MockERC721WithRoyalty.sol";
@@ -25,14 +26,15 @@ contract Fixture is Test, ERC721TokenReceiver {
     Pair public ethPair;
     LpToken public ethPairLpToken;
     CaviarEthRoyaltyRouter public router;
+    StolenNftFilterOracle public stolenNftFilterOracle;
 
     address public babe = address(0xbabe);
 
     constructor() {
         createPairScript = new CreatePairScript();
+        stolenNftFilterOracle = new StolenNftFilterOracle();
 
-        c = new Caviar();
-        c.setUseReservoirFilterOracle(false);
+        c = new Caviar(address(0));
 
         bayc = new MockERC721WithRoyalty("yeet", "YEET");
         usd = new MockERC20("us dollar", "USD", 6);
