@@ -108,6 +108,33 @@
         "internalType": "bytes32[][]",
         "name": "proofs",
         "type": "bytes32[][]"
+      },
+      {
+        "components": [
+          {
+            "internalType": "bytes32",
+            "name": "id",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes",
+            "name": "payload",
+            "type": "bytes"
+          },
+          {
+            "internalType": "uint256",
+            "name": "timestamp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes",
+            "name": "signature",
+            "type": "bytes"
+          }
+        ],
+        "internalType": "struct ReservoirOracle.Message[]",
+        "name": "messages",
+        "type": "tuple[]"
       }
     ],
     "name": "nftSell",

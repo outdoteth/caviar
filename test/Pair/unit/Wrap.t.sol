@@ -71,20 +71,20 @@ contract WrapTest is Fixture {
 
     function testItValidatesTokensAreNotStolenMessage() public {
         // arrange
-        address milady = 0x5Af0D9827E0c53E4799BB226655A1de152A425a5;
+        address milady = 0xF0a8d1c9eB9FCde3221FEAfA4BD525771687BD10;
         vm.etch(milady, address(bayc).code);
         vm.mockCall(milady, abi.encodeWithSignature("safeTransferFrom(address,address,uint256)"), abi.encode(true));
         c.setStolenNftFilterOracle(address(stolenNftFilterOracle));
 
-        uint256 tokenId = 5;
+        uint256 tokenId = 63;
         Pair pair = c.create(milady, address(0), bytes32(0));
 
-        bytes32 id = 0x48162c6fe421732f8db386e8b17f8d0d5dff7aea3cbc7ea49e9514dfe561b9d6;
+        bytes32 id = 0x026b8d21dd591b867de9a6dfab63e879ab848dadd218fb7d8f30a40847786c12;
         bytes memory payload =
-            hex"00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000062437f50";
-        uint256 timestamp = 1673728205;
+            hex"00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+        uint256 timestamp = 1673822403;
         bytes memory signature =
-            hex"927564156c1222f49935ef692fd63d2cc2976d7f3b3db55c0cfd0184d47d0308337ae730d740628a92aff17601d7f4982ba8da3b59a03ad62fdab1f8a8ec6f891c";
+            hex"a7538e541c899f54c4e016c3f971f0ca47e9a8e99ad677835b63210c9187565701283bf2d457cdd964f6b457d1d8887266c57fc5624a76a121b20b9fb98e09981c";
 
         vm.warp(timestamp + 1);
 
