@@ -1,15 +1,30 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
+import "solmate/auth/Owned.sol";
 import "reservoir-oracle/ReservoirOracle.sol";
 
 /// @title StolenNftFilterOracle
 /// @author out.eth (@outdoteth)
 /// @notice A contract to check that a set of NFTs are not stolen.
-contract StolenNftFilterOracle is ReservoirOracle {
+contract StolenNftFilterOracle is ReservoirOracle, Owned {
     bytes32 private constant TOKEN_TYPE_HASH = keccak256("Token(address contract,uint256 tokenId)");
+    uint256 public cooldownPeriod = 0;
+    uint256 public validFor = 60 minutes;
 
-    constructor() ReservoirOracle(0x32dA57E736E05f75aa4FaE2E9Be60FD904492726) {}
+    constructor() Owned(msg.sender) ReservoirOracle(0x32dA57E736E05f75aa4FaE2E9Be60FD904492726) {}
+
+    /// @notice Sets the cooldown period.
+    /// @param _cooldownPeriod The cooldown period.
+    function setCooldownPeriod(uint256 _cooldownPeriod) public onlyOwner {
+        cooldownPeriod = _cooldownPeriod;
+    }
+
+    /// @notice Sets the valid for period.
+    /// @param _validFor The valid for period.
+    function setValidFor(uint256 _validFor) public onlyOwner {
+        validFor = _validFor;
+    }
 
     /// @notice Checks that a set of NFTs are not stolen.
     /// @param tokenAddress The address of the NFT contract.
@@ -23,14 +38,16 @@ contract StolenNftFilterOracle is ReservoirOracle {
             Message calldata message = messages[i];
 
             // check that the signer is correct and message id matches token id + token address
-            uint256 validFor = 60 minutes;
             bytes32 expectedMessageId = keccak256(abi.encode(TOKEN_TYPE_HASH, tokenAddress, tokenIds[i]));
             require(_verifyMessage(expectedMessageId, validFor, message), "Message has invalid signature");
 
-            (bool isFlagged,) = abi.decode(message.payload, (bool, uint256));
+            (bool isFlagged, uint256 lastTransferTime) = abi.decode(message.payload, (bool, uint256));
 
             // check that the NFT is not stolen
             require(!isFlagged, "NFT is flagged as suspicious");
+
+            // check that the NFT was not transferred too recently
+            require(lastTransferTime + cooldownPeriod < block.timestamp, "NFT was transferred too recently");
         }
     }
 }
