@@ -528,15 +528,15 @@ contract Pair is ERC20, ERC721TokenReceiver {
     /// @return fractionalTokenAmount The amount of fractional tokens received.
     function removeQuote(uint256 lpTokenAmount) public view returns (uint256, uint256) {
         uint256 lpTokenSupply = lpToken.totalSupply();
-
         uint256 baseTokenOutputAmount = (baseTokenReserves() * lpTokenAmount) / lpTokenSupply;
         uint256 fractionalTokenOutputAmount = (fractionalTokenReserves() * lpTokenAmount) / lpTokenSupply;
+        uint256 upperFractionalTokenOutputAmount = (fractionalTokenReserves() * (lpTokenAmount + 1)) / lpTokenSupply;
 
         if (
             fractionalTokenOutputAmount % 1e18 != 0
-                && ((fractionalTokenReserves() * (lpTokenAmount + 1)) / lpTokenSupply) % 1e18 == 0 && lpTokenSupply > 1e15
+                && upperFractionalTokenOutputAmount - fractionalTokenOutputAmount <= 100 && lpTokenSupply > 1e15
         ) {
-            fractionalTokenOutputAmount = (fractionalTokenReserves() * (lpTokenAmount + 1)) / lpTokenSupply;
+            fractionalTokenOutputAmount = upperFractionalTokenOutputAmount;
         }
 
         return (baseTokenOutputAmount, fractionalTokenOutputAmount);
