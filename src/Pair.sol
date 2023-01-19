@@ -534,7 +534,7 @@ contract Pair is ERC20, ERC721TokenReceiver {
 
         if (
             fractionalTokenOutputAmount % 1e18 != 0
-                && upperFractionalTokenOutputAmount - fractionalTokenOutputAmount <= 10 && lpTokenSupply > 1e15
+                && upperFractionalTokenOutputAmount - fractionalTokenOutputAmount <= 1000 && lpTokenSupply > 1e15
         ) {
             fractionalTokenOutputAmount = upperFractionalTokenOutputAmount;
         }
