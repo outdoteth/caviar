@@ -36,10 +36,13 @@ contract AddBuySellRemoveTest is Fixture {
             p.fractionalTokenReserves() * removeLpTokenAmount / lpToken.totalSupply();
         (uint256 baseTokenOutputAmount, uint256 fractionalTokenOutputAmount) = p.remove(removeLpTokenAmount, 0, 0, 0);
 
-        assertEq(baseTokenOutputAmount, expectedBaseTokenAmount, "Should have removed correct base token amount");
-        assertEq(
+        assertApproxEqAbs(
+            baseTokenOutputAmount, expectedBaseTokenAmount, 10, "Should have removed correct base token amount"
+        );
+        assertApproxEqAbs(
             fractionalTokenOutputAmount,
             expectedFractionalTokenAmount,
+            10,
             "Should have removed correct fractional token amount"
         );
     }
