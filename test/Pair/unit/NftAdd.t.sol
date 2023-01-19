@@ -28,7 +28,7 @@ contract NftAddTest is Fixture {
 
     function testItInitMintsLpTokensToSender() public {
         // arrange
-        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * tokenIds.length * 1e18) - 1000;
+        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * tokenIds.length * 1e18) - 100_000;
         uint256 expectedLpTokenAmount = minLpTokenAmount;
         address owner = address(0xdead);
         c.transferOwnership(owner);
@@ -40,13 +40,13 @@ contract NftAddTest is Fixture {
         // assert
         assertEq(lpTokenAmount, expectedLpTokenAmount, "Should have returned correct lp token amount");
         assertEq(lpToken.balanceOf(address(this)), expectedLpTokenAmount, "Should have minted lp tokens");
-        assertEq(lpToken.totalSupply(), expectedLpTokenAmount + 1000, "Should have increased lp supply");
-        assertEq(lpToken.balanceOf(owner), 1000, "Should have minted 1000 lp tokens to owner");
+        assertEq(lpToken.totalSupply(), expectedLpTokenAmount + 100_000, "Should have increased lp supply");
+        assertEq(lpToken.balanceOf(owner), 100_000, "Should have minted 1000 lp tokens to owner");
     }
 
     function testItTransfersBaseTokens() public {
         // arrange
-        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * tokenIds.length * 1e18) - 1000;
+        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * tokenIds.length * 1e18) - 100_000;
         uint256 balanceBefore = usd.balanceOf(address(this));
 
         // act
@@ -60,7 +60,7 @@ contract NftAddTest is Fixture {
 
     function testItTransfersNfts() public {
         // arrange
-        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * tokenIds.length * 1e18) - 1000;
+        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * tokenIds.length * 1e18) - 100_000;
 
         // act
         p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, 0, 0, type(uint256).max, proofs, messages);
@@ -73,7 +73,7 @@ contract NftAddTest is Fixture {
 
     function testItRevertsSlippageOnInitMint() public {
         // arrange
-        uint256 minLpTokenAmount = (Math.sqrt(baseTokenAmount * tokenIds.length * 1e18) - 1000) + 1; // increase 1 to cause revert
+        uint256 minLpTokenAmount = (Math.sqrt(baseTokenAmount * tokenIds.length * 1e18) - 100_000) + 1; // increase 1 to cause revert
 
         // act
         vm.expectRevert("Slippage: lp token amount out");
@@ -84,7 +84,7 @@ contract NftAddTest is Fixture {
         // arrange
         uint256 fractionalTokenAmount = 101 * 1e18;
         deal(address(p), address(this), fractionalTokenAmount, true);
-        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * tokenIds.length * 1e18) - 1000;
+        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * tokenIds.length * 1e18) - 100_000;
         p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max, 0); // initial add
         uint256 lpTokenSupplyBefore = lpToken.totalSupply();
 
@@ -117,7 +117,7 @@ contract NftAddTest is Fixture {
     function testItRevertsSlippageAfterInitMint() public {
         // arrange
         uint256 fractionalTokenAmount = 101 * 1e18;
-        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * tokenIds.length * 1e18) - 1000;
+        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * tokenIds.length * 1e18) - 100_000;
         deal(address(p), address(this), fractionalTokenAmount, true);
         p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max, 0); // initial add
 
@@ -133,7 +133,7 @@ contract NftAddTest is Fixture {
         // arrange
         Pair pair = createPairScript.create(address(bayc), address(usd), "YEET-mids.json", address(c));
         proofs = createPairScript.generateMerkleProofs("YEET-mids.json", tokenIds);
-        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * tokenIds.length * 1e18) - 1000;
+        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * tokenIds.length * 1e18) - 100_000;
         bayc.setApprovalForAll(address(pair), true);
         usd.approve(address(pair), type(uint256).max);
 
@@ -148,7 +148,7 @@ contract NftAddTest is Fixture {
 
     function testItRevertsIfDeadlinePassed() public {
         // arrange
-        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * tokenIds.length * 1e18) - 1000;
+        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * tokenIds.length * 1e18) - 100_000;
         skip(100);
         uint256 deadline = block.timestamp - 1;
 

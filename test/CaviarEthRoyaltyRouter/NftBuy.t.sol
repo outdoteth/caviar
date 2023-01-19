@@ -23,7 +23,7 @@ contract NftBuyCaviarEthRoyaltyTest is Fixture {
         bayc.setApprovalForAll(address(ethPair), true);
 
         uint256 baseTokenAmount = 3.15e18;
-        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * tokenIds.length * 1e18) - 1000;
+        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * tokenIds.length * 1e18) - 100_000;
         deal(address(this), baseTokenAmount);
         ethPair.nftAdd{value: baseTokenAmount}(
             baseTokenAmount, tokenIds, minLpTokenAmount, 0, 0, type(uint256).max, proofs, messages

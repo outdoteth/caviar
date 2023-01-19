@@ -11,8 +11,8 @@ import "../../../script/CreatePair.s.sol";
 contract AddTest is Fixture {
     event Add(uint256 indexed baseTokenAmount, uint256 indexed fractionalTokenAmount, uint256 indexed lpTokenAmount);
 
-    uint256 public baseTokenAmount = 10000;
-    uint256 public fractionalTokenAmount = 300;
+    uint256 public baseTokenAmount = 10000000;
+    uint256 public fractionalTokenAmount = 3000000;
 
     function setUp() public {
         deal(address(usd), address(this), baseTokenAmount, true);
@@ -29,7 +29,7 @@ contract AddTest is Fixture {
 
     function testItTransfersBaseTokens() public {
         // arrange
-        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) - 1000;
+        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) - 100_000;
         uint256 balanceBefore = usd.balanceOf(address(this));
 
         // act
@@ -43,7 +43,7 @@ contract AddTest is Fixture {
 
     function testItTransfersFractionalTokens() public {
         // arrange
-        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) - 1000;
+        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) - 100_000;
         uint256 balanceBefore = p.balanceOf(address(this));
 
         // act
@@ -60,7 +60,7 @@ contract AddTest is Fixture {
 
     function testItRevertsSlippageOnInitMint() public {
         // arrange
-        uint256 minLpTokenAmount = (Math.sqrt(baseTokenAmount * fractionalTokenAmount) - 1000) + 1; // increase 1 to cause revert
+        uint256 minLpTokenAmount = (Math.sqrt(baseTokenAmount * fractionalTokenAmount) - 100_000) + 1; // increase 1 to cause revert
 
         // act
         vm.expectRevert("Slippage: lp token amount out");
@@ -69,7 +69,7 @@ contract AddTest is Fixture {
 
     function testItMintsLpTokensAfterInit() public {
         // arrange
-        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) - 1000;
+        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) - 100_000;
         p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max, 0); // initial add
         uint256 lpTokenSupplyBefore = lpToken.totalSupply();
 
@@ -94,7 +94,7 @@ contract AddTest is Fixture {
 
     function testItRevertsIfPriceIsGreaterThanMax() public {
         // arrange
-        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) - 1000;
+        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) - 100_000;
         p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max, 0); // initial add
 
         uint256 expectedLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) * 17;
@@ -111,7 +111,7 @@ contract AddTest is Fixture {
 
     function testItRevertsIfPriceIsLessThanMin() public {
         // arrange
-        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) - 1000;
+        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) - 100_000;
         p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max, 0); // initial add
 
         uint256 expectedLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) * 17;
@@ -128,7 +128,7 @@ contract AddTest is Fixture {
 
     function testItRevertsSlippageAfterInitMint() public {
         // arrange
-        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) - 1000;
+        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) - 100_000;
         p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max, 0); // initial add
 
         minLpTokenAmount = (baseTokenAmount * fractionalTokenAmount * 17) + 1; // add 1 to cause a revert
@@ -166,7 +166,7 @@ contract AddTest is Fixture {
 
     function testItTransfersEther() public {
         // arrange
-        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) - 1000;
+        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) - 100_000;
         uint256 balanceBefore = address(this).balance;
 
         // act
@@ -182,7 +182,7 @@ contract AddTest is Fixture {
 
     function testItMintsLpTokensAfterInitWithEther() public {
         // arrange
-        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) - 1000;
+        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) - 100_000;
         ethPair.add{value: baseTokenAmount}(
             baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max, 0
         ); // initial add
@@ -212,7 +212,7 @@ contract AddTest is Fixture {
 
     function testItEmitsAddEvent() public {
         // arrange
-        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) - 1000;
+        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) - 100_000;
 
         // act
         vm.expectEmit(true, true, true, true);
@@ -231,7 +231,7 @@ contract AddTest is Fixture {
 
     function testItRevertsIfDeadlinePassed() public {
         // arrange
-        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) - 1000;
+        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) - 100_000;
         skip(100);
         uint256 deadline = block.timestamp - 1;
 
@@ -242,11 +242,11 @@ contract AddTest is Fixture {
 
     function testItInitMintsLpTokensToSender(uint256 _baseTokenAmount, uint256 _fractionalTokenAmount) public {
         // arrange
-        _baseTokenAmount = bound(_baseTokenAmount, 2000, type(uint128).max);
-        _fractionalTokenAmount = bound(_fractionalTokenAmount, 2000, 100_000_000 * 1e18);
+        _baseTokenAmount = bound(_baseTokenAmount, 20000000, type(uint128).max);
+        _fractionalTokenAmount = bound(_fractionalTokenAmount, 20000000, 100_000_000 * 1e18);
         deal(address(usd), address(this), _baseTokenAmount, true);
         deal(address(p), address(this), _fractionalTokenAmount, true);
-        uint256 minLpTokenAmount = Math.sqrt(_baseTokenAmount * _fractionalTokenAmount) - 1000;
+        uint256 minLpTokenAmount = Math.sqrt(_baseTokenAmount * _fractionalTokenAmount) - 100_000;
         uint256 expectedLpTokenAmount = minLpTokenAmount;
         address owner = address(0xbeef);
         c.transferOwnership(owner);
@@ -258,17 +258,17 @@ contract AddTest is Fixture {
         // assert
         assertEq(lpTokenAmount, expectedLpTokenAmount, "Should have returned correct lp token amount");
         assertEq(lpToken.balanceOf(address(this)), expectedLpTokenAmount, "Should have minted lp tokens");
-        assertEq(lpToken.totalSupply(), expectedLpTokenAmount + 1000, "Should have increased lp supply");
-        assertEq(lpToken.balanceOf(address(owner)), 1000, "Should have minted first 1000 lp tokens for owner");
+        assertEq(lpToken.totalSupply(), expectedLpTokenAmount + 100000, "Should have increased lp supply");
+        assertEq(lpToken.balanceOf(address(owner)), 100000, "Should have minted first 1000 lp tokens for owner");
     }
 
     function testItMintsLpTokensAfterInit(uint256 _initBaseTokenAmount, uint256 _initFractionalTokenAmount) public {
         // arrange
-        _initBaseTokenAmount = bound(_initBaseTokenAmount, 2000, type(uint128).max);
-        _initFractionalTokenAmount = bound(_initFractionalTokenAmount, 2000, 100_000_000 * 1e18);
+        _initBaseTokenAmount = bound(_initBaseTokenAmount, 2000000, type(uint128).max);
+        _initFractionalTokenAmount = bound(_initFractionalTokenAmount, 2000000, 100_000_000 * 1e18);
         deal(address(usd), address(this), _initBaseTokenAmount, true);
         deal(address(p), address(this), _initFractionalTokenAmount, true);
-        uint256 initMinLpTokenAmount = Math.sqrt(_initBaseTokenAmount * _initFractionalTokenAmount) - 1000;
+        uint256 initMinLpTokenAmount = Math.sqrt(_initBaseTokenAmount * _initFractionalTokenAmount) - 100_000;
         p.add(_initBaseTokenAmount, _initFractionalTokenAmount, initMinLpTokenAmount, 0, type(uint256).max, 0); // initial add
         uint256 lpTokenSupplyBefore = lpToken.totalSupply();
 

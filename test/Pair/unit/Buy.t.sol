@@ -23,7 +23,7 @@ contract BuyTest is Fixture {
 
         usd.approve(address(p), type(uint256).max);
 
-        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) - 1000;
+        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) - 100_000;
         p.add(baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max, 0);
 
         maxInputAmount =

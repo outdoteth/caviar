@@ -20,7 +20,7 @@ contract NftSellCaviarEthRoyaltyTest is Fixture {
         deal(address(this), type(uint256).max / 10);
         deal(address(ethPair), address(this), fractionalTokenAmount, true);
 
-        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) - 1000;
+        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * fractionalTokenAmount) - 100_000;
         ethPair.add{value: baseTokenAmount}(
             baseTokenAmount, fractionalTokenAmount, minLpTokenAmount, 0, type(uint256).max, 0
         );

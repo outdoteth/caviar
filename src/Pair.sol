@@ -22,7 +22,7 @@ contract Pair is ERC20, ERC721TokenReceiver {
 
     uint256 public constant CLOSE_GRACE_PERIOD = 7 days;
     uint256 private constant ONE = 1e18;
-    uint256 private constant MINIMUM_LIQUIDITY = 1000;
+    uint256 private constant MINIMUM_LIQUIDITY = 100_000;
 
     address public immutable nft;
     address public immutable baseToken; // address(0) for ETH
@@ -528,13 +528,6 @@ contract Pair is ERC20, ERC721TokenReceiver {
     /// @return fractionalTokenAmount The amount of fractional tokens received.
     function removeQuote(uint256 lpTokenAmount) public view returns (uint256, uint256) {
         uint256 lpTokenSupply = lpToken.totalSupply();
-
-        // If lp token supply is sufficiently high then add one to lpTokenAmount
-        // to account for rounding errors and provide better UX overall.
-        if (lpTokenSupply > 1e15) {
-            lpTokenAmount += 1;
-        }
-
         uint256 baseTokenOutputAmount = (baseTokenReserves() * lpTokenAmount) / lpTokenSupply;
         uint256 fractionalTokenOutputAmount = (fractionalTokenReserves() * lpTokenAmount) / lpTokenSupply;
 

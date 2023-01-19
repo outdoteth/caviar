@@ -13,14 +13,14 @@ contract AddBuySellRemoveTest is Fixture {
         uint256 addFractionalTokenAmount,
         uint256 buyTokenAmount
     ) public {
-        addBaseTokenAmount = bound(addBaseTokenAmount, 10000, type(uint96).max);
-        addFractionalTokenAmount = bound(addFractionalTokenAmount, 10000, 10_000_000 * 1e18);
+        addBaseTokenAmount = bound(addBaseTokenAmount, 10000000, type(uint96).max);
+        addFractionalTokenAmount = bound(addFractionalTokenAmount, 10000000, 10_000_000 * 1e18);
         buyTokenAmount = bound(buyTokenAmount, 1, addFractionalTokenAmount - 1);
 
         // add liquidity
         deal(address(usd), address(this), addBaseTokenAmount, true);
         deal(address(p), address(this), addFractionalTokenAmount, true);
-        uint256 lpTokenAmount = Math.sqrt(addBaseTokenAmount * addFractionalTokenAmount) - 1000;
+        uint256 lpTokenAmount = Math.sqrt(addBaseTokenAmount * addFractionalTokenAmount) - 100_000;
         usd.approve(address(p), type(uint256).max);
         p.add(addBaseTokenAmount, addFractionalTokenAmount, lpTokenAmount, 0, type(uint256).max, 0);
 

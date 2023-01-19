@@ -10,8 +10,8 @@ import "../../../src/Caviar.sol";
 contract RemoveTest is Fixture {
     event Remove(uint256 indexed baseTokenAmount, uint256 indexed fractionalTokenAmount, uint256 indexed lpTokenAmount);
 
-    uint256 public totalBaseTokenAmount = 10000;
-    uint256 public totalFractionalTokenAmount = 1000;
+    uint256 public totalBaseTokenAmount = 1000000;
+    uint256 public totalFractionalTokenAmount = 1000000;
     uint256 public totalLpTokenAmount;
 
     function setUp() public {

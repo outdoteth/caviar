@@ -25,7 +25,7 @@ contract NftBuyTest is Fixture {
         usd.approve(address(p), type(uint256).max);
 
         uint256 baseTokenAmount = 3.15e18;
-        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * tokenIds.length * 1e18) - 1000;
+        uint256 minLpTokenAmount = Math.sqrt(baseTokenAmount * tokenIds.length * 1e18) - 100_000;
         deal(address(usd), address(this), baseTokenAmount, true);
         p.nftAdd(baseTokenAmount, tokenIds, minLpTokenAmount, 0, 0, type(uint256).max, proofs, messages);
 
