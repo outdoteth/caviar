@@ -14,6 +14,9 @@ line_length = 120
 [fuzz]
 runs = 256
 
+[doc]
+ignore = ["./src/lib/SafeERC20Namer.sol"]
+
 [profile.ci]
 ffi = false
 no_match_test = "MerkleProof"

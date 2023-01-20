@@ -19,5 +19,6 @@ contract DeployScript is Script {
         Caviar c = new Caviar(address(s));
 
         console.log("caviar:", address(c));
+        console.log("stolen nft filter oracle:", address(s));
     }
 }
