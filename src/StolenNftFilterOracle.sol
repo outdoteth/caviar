@@ -26,6 +26,10 @@ contract StolenNftFilterOracle is ReservoirOracle, Owned {
         validFor = _validFor;
     }
 
+    function updateReservoirOracleAddress(address newReservoirOracleAddress) public override onlyOwner {
+        RESERVOIR_ORACLE_ADDRESS = newReservoirOracleAddress;
+    }
+
     /// @notice Checks that a set of NFTs are not stolen.
     /// @param tokenAddress The address of the NFT contract.
     /// @param tokenIds The ids of the NFTs.
