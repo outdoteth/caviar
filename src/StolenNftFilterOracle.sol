@@ -12,7 +12,7 @@ contract StolenNftFilterOracle is ReservoirOracle, Owned {
     uint256 public cooldownPeriod = 0;
     uint256 public validFor = 60 minutes;
 
-    constructor() Owned(msg.sender) ReservoirOracle(0x32dA57E736E05f75aa4FaE2E9Be60FD904492726) {}
+    constructor() Owned(msg.sender) ReservoirOracle(0xAeB1D03929bF87F69888f381e73FBf75753d75AF) {}
 
     /// @notice Sets the cooldown period.
     /// @param _cooldownPeriod The cooldown period.
