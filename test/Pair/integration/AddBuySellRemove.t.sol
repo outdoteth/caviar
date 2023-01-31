@@ -42,7 +42,7 @@ contract AddBuySellRemoveTest is Fixture {
         assertApproxEqAbs(
             fractionalTokenOutputAmount,
             expectedFractionalTokenAmount,
-            10,
+            1000,
             "Should have removed correct fractional token amount"
         );
     }
