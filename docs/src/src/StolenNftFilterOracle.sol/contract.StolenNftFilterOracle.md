@@ -1,5 +1,5 @@
 # StolenNftFilterOracle
-[Git Source](https://github.com/outdoteth/Caviar/blob/fe772f95d422ab3b2897f7403c37b8326c5a1bbf/src/StolenNftFilterOracle.sol)
+[Git Source](https://github.com/outdoteth/Caviar/blob/1be83e69941dba34e584304f87901ad3aa5a1710/src/StolenNftFilterOracle.sol)
 
 **Inherits:**
 ReservoirOracle, Owned
@@ -37,7 +37,7 @@ uint256 public validFor = 60 minutes;
 
 
 ```solidity
-constructor() Owned(msg.sender) ReservoirOracle(0x32dA57E736E05f75aa4FaE2E9Be60FD904492726);
+constructor() Owned(msg.sender) ReservoirOracle(0xAeB1D03929bF87F69888f381e73FBf75753d75AF);
 ```
 
 ### setCooldownPeriod
@@ -69,6 +69,13 @@ function setValidFor(uint256 _validFor) public onlyOwner;
 |----|----|-----------|
 |`_validFor`|`uint256`|The valid for period.|
 
+
+### updateReservoirOracleAddress
+
+
+```solidity
+function updateReservoirOracleAddress(address newReservoirOracleAddress) public override onlyOwner;
+```
 
 ### validateTokensAreNotStolen
 
