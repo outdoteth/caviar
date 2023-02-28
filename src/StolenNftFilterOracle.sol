@@ -12,6 +12,8 @@ contract StolenNftFilterOracle is ReservoirOracle, Owned {
     uint256 public cooldownPeriod = 0;
     uint256 public validFor = 60 minutes;
 
+    mapping(address => bool) public isDisabled;
+
     constructor() Owned(msg.sender) ReservoirOracle(0xAeB1D03929bF87F69888f381e73FBf75753d75AF) {}
 
     /// @notice Sets the cooldown period.
@@ -26,8 +28,17 @@ contract StolenNftFilterOracle is ReservoirOracle, Owned {
         validFor = _validFor;
     }
 
+    /// @notice Updates the reservoir oracle address.
+    /// @param newReservoirOracleAddress The new reservoir oracle address.
     function updateReservoirOracleAddress(address newReservoirOracleAddress) public override onlyOwner {
         RESERVOIR_ORACLE_ADDRESS = newReservoirOracleAddress;
+    }
+
+    /// @notice Sets whether a token validation is disabled.
+    /// @param tokenAddress The token address.
+    /// @param _isDisabled Whether the token validation is disabled.
+    function setIsDisabled(address tokenAddress, bool _isDisabled) public onlyOwner {
+        isDisabled[tokenAddress] = _isDisabled;
     }
 
     /// @notice Checks that a set of NFTs are not stolen.
@@ -38,6 +49,8 @@ contract StolenNftFilterOracle is ReservoirOracle, Owned {
         public
         view
     {
+        if (isDisabled[tokenAddress]) return;
+
         for (uint256 i = 0; i < tokenIds.length; i++) {
             Message calldata message = messages[i];
 
