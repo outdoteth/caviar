@@ -17,7 +17,7 @@ contract MockERC721WithRoyalty is ERC721, ERC2981 {
         return baseURI;
     }
 
-    function supportsInterface(bytes4 interfaceId) public view override(ERC2981, ERC721) returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view override (ERC2981, ERC721) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 
