@@ -25,9 +25,13 @@ jobs:
       - name: Run Forge build
         run: |
           forge --version
+          forge build
         id: build
 
       - name: Run Forge tests
         run: |
           forge test -vvv
         id: test
+
+      - name: Check formatting
+        run: forge fmt --check

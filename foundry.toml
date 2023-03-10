@@ -14,7 +14,7 @@ line_length = 120
 [fuzz]
 runs = 256
 
-[doc]
+[profile.doc]
 ignore = ["./src/lib/SafeERC20Namer.sol"]
 
 [profile.ci]
