@@ -23,7 +23,7 @@ contract FakeNft is ERC721A, ERC2981 {
         return string(abi.encodePacked(baseUri, _toString(tokenId)));
     }
 
-    function supportsInterface(bytes4 interfaceId) public view override (ERC2981, ERC721A) returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view override(ERC2981, ERC721A) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 
