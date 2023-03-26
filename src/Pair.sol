@@ -481,7 +481,7 @@ contract Pair is ERC20, ERC721TokenReceiver {
     }
 
     /// @notice The amount of base tokens required to buy a given amount of fractional tokens.
-    /// @dev Calculated using the xyk invariant and a 30bps fee.
+    /// @dev Calculated using the xyk invariant and a 100bps fee.
     /// @param outputAmount The amount of fractional tokens to buy.
     /// @return inputAmount The amount of base tokens required.
     function buyQuote(uint256 outputAmount) public view returns (uint256) {
@@ -491,7 +491,7 @@ contract Pair is ERC20, ERC721TokenReceiver {
     }
 
     /// @notice The amount of base tokens received for selling a given amount of fractional tokens.
-    /// @dev Calculated using the xyk invariant and a 30bps fee.
+    /// @dev Calculated using the xyk invariant and a 100bps fee.
     /// @param inputAmount The amount of fractional tokens to sell.
     /// @return outputAmount The amount of base tokens received.
     function sellQuote(uint256 inputAmount) public view returns (uint256) {
