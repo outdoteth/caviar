@@ -1,6 +1,12 @@
 [
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_stolenNftFilterOracle",
+        "type": "address"
+      }
+    ],
     "stateMutability": "nonpayable",
     "type": "constructor"
   },
@@ -71,6 +77,19 @@
       }
     ],
     "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "stolenNftFilterOracle",
+        "type": "address"
+      }
+    ],
+    "name": "SetStolenNftFilterOracle",
     "type": "event"
   },
   {
@@ -157,6 +176,32 @@
       }
     ],
     "name": "pairs",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_stolenNftFilterOracle",
+        "type": "address"
+      }
+    ],
+    "name": "setStolenNftFilterOracle",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "stolenNftFilterOracle",
     "outputs": [
       {
         "internalType": "address",
